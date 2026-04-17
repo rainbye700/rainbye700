@@ -1,0 +1,5369 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1024">
+<title>經建勇者 · 上榜教練 v3 學習遊戲</title>
+<style>
+  :root {
+    --base-font: 16px;
+    --bg: #f5efe0;
+    --bg-soft: #ffffff;
+    --bg-card: #fffdf5;
+    --ink: #2a2418;
+    --ink-soft: #6b5e4a;
+    --line: #d7c9a8;
+    --gold: #c9a24a;
+    --gold-dark: #8a6a1f;
+    --xp: #4a7c3f;
+    --xp-bg: #e6dcc0;
+    --danger: #a8342b;
+    --success: #2e7d47;
+    --blue: #2f5d86;
+    --star: #e0a830;
+    --shadow: 0 2px 0 rgba(0,0,0,0.08), 0 8px 20px rgba(80,60,20,0.08);
+  }
+  html[data-theme="dark"] {
+    --bg: #18161f;
+    --bg-soft: #221f2a;
+    --bg-card: #2a2735;
+    --ink: #eee4d2;
+    --ink-soft: #a99c86;
+    --line: #3d3748;
+    --gold: #e0b860;
+    --gold-dark: #c99a3a;
+    --xp: #6eb55e;
+    --xp-bg: #2c2a38;
+    --danger: #e36a60;
+    --success: #78d488;
+    --blue: #7fb4e0;
+    --star: #f0c858;
+    --shadow: 0 2px 0 rgba(0,0,0,0.4), 0 8px 20px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    font-size: var(--base-font);
+    line-height: 1.6;
+    min-width: 1024px;
+    min-height: 100vh;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(201,162,74,0.08), transparent 50%),
+      radial-gradient(circle at 90% 100%, rgba(47,93,134,0.05), transparent 50%);
+  }
+  html[data-theme="dark"] body {
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(224,184,96,0.06), transparent 50%),
+      radial-gradient(circle at 90% 100%, rgba(127,180,224,0.04), transparent 50%);
+  }
+  header.topbar {
+    background: var(--bg-soft);
+    border-bottom: 2px solid var(--line);
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    color: var(--gold-dark);
+  }
+  header .brand .logo {
+    width: 34px;
+    height: 34px;
+  }
+  header nav {
+    display: flex;
+    gap: 6px;
+  }
+  header nav button {
+    background: transparent;
+    border: 1.5px solid transparent;
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  header nav button:hover {
+    background: var(--bg-card);
+    border-color: var(--line);
+  }
+  header nav button.active {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold-dark);
+  }
+  header nav button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+  section.screen { display: none; }
+  section.screen.active { display: block; animation: fadein 0.25s ease; }
+  @keyframes fadein { from {opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+
+  .card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    box-shadow: var(--shadow);
+  }
+  .card + .card { margin-top: 18px; }
+  h1, h2, h3 { margin: 0 0 0.6em; color: var(--gold-dark); font-weight: 700; }
+  html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3 { color: var(--gold); }
+  h1 { font-size: 1.6rem; letter-spacing: 0.06em; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.05rem; }
+  .muted { color: var(--ink-soft); font-size: 0.92em; }
+
+  /* Home: hero character panel */
+  .hero {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+  .hero .avatar-wrap {
+    background: linear-gradient(160deg, var(--bg-soft), var(--bg-card));
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    width: 180px;
+    height: 180px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 0 var(--gold-dark), var(--shadow);
+  }
+  .hero .avatar-wrap svg { width: 140px; height: 140px; }
+  .hero .info .level-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .hero .info .title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .hero .info .sub { color: var(--ink-soft); margin-bottom: 14px; }
+  .xpbar {
+    height: 18px;
+    background: var(--xp-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    position: relative;
+  }
+  .xpbar > .fill {
+    height: 100%;
+    background: linear-gradient(180deg, #6dbf55, var(--xp));
+    transition: width 0.5s cubic-bezier(.3,.9,.4,1);
+  }
+  .xpbar > .label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.82em;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    font-weight: 600;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .stat-box {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-box .n { font-size: 1.6rem; font-weight: 700; color: var(--gold-dark); }
+  html[data-theme="dark"] .stat-box .n { color: var(--gold); }
+  .stat-box .l { font-size: 0.86em; color: var(--ink-soft); margin-top: 4px; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  button.btn {
+    background: var(--gold);
+    color: #fff;
+    border: 2px solid var(--gold-dark);
+    padding: 11px 22px;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    box-shadow: 0 3px 0 var(--gold-dark);
+    transition: transform 0.08s;
+  }
+  button.btn:hover { transform: translateY(-1px); }
+  button.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--gold-dark); }
+  button.btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line);
+    box-shadow: 0 3px 0 var(--line);
+  }
+  button.btn.danger {
+    background: var(--danger);
+    border-color: #6d1f19;
+    box-shadow: 0 3px 0 #6d1f19;
+  }
+  button.btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  button.btn .lock::before { content: "🔒 "; }
+
+  /* Quiz screen */
+  .qtop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 0.88em;
+  }
+  .chip.subject { border-color: var(--blue); color: var(--blue); }
+  .chip.diff { color: var(--star); border-color: var(--star); }
+  .chip.year { color: var(--ink-soft); }
+
+  .question-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin: 12px 0 22px;
+    white-space: pre-wrap;
+  }
+  .options { display: grid; gap: 10px; }
+  .opt {
+    background: var(--bg-soft);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: var(--ink);
+    transition: all 0.12s;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--gold); background: var(--bg-card); }
+  .opt .letter {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: var(--ink-soft);
+  }
+  .opt.correct { border-color: var(--success); background: rgba(46,125,71,0.12); }
+  .opt.correct .letter { background: var(--success); color: #fff; border-color: var(--success); }
+  .opt.wrong { border-color: var(--danger); background: rgba(168,52,43,0.12); }
+  .opt.wrong .letter { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .opt:disabled { cursor: default; }
+
+  .hint-box {
+    background: rgba(47,93,134,0.08);
+    border-left: 4px solid var(--blue);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 14px;
+    font-size: 0.95em;
+  }
+  .hint-box .hdr { font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+  html[data-theme="dark"] .hint-box { background: rgba(127,180,224,0.12); }
+
+  .explain-box {
+    background: var(--bg-soft);
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 16px;
+  }
+  .explain-box .exp-sec { margin-bottom: 10px; }
+  .explain-box .exp-sec:last-child { margin-bottom: 0; }
+  .explain-box .exp-title {
+    font-weight: 700;
+    color: var(--gold-dark);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  html[data-theme="dark"] .explain-box .exp-title { color: var(--gold); }
+
+  .feedback-banner {
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .feedback-banner.correct { background: rgba(46,125,71,0.15); color: var(--success); border: 1px solid var(--success); }
+  .feedback-banner.wrong { background: rgba(168,52,43,0.15); color: var(--danger); border: 1px solid var(--danger); }
+
+  .qtools { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Unlocks list */
+  ul.unlocks { list-style: none; padding: 0; margin: 0; }
+  ul.unlocks li {
+    padding: 10px 14px;
+    border-bottom: 1px dashed var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  ul.unlocks li:last-child { border-bottom: none; }
+  ul.unlocks .lv { font-weight: 700; color: var(--gold-dark); min-width: 56px; }
+  html[data-theme="dark"] ul.unlocks .lv { color: var(--gold); }
+  ul.unlocks .unlocked { color: var(--success); }
+  ul.unlocks .locked { color: var(--ink-soft); }
+
+  /* Wrong book */
+  .wrong-item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    background: var(--bg-soft);
+  }
+  .wrong-item .meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 6px; }
+  .wrong-item .q { font-weight: 600; margin-bottom: 8px; }
+  .wrong-item.mastered { opacity: 0.6; }
+  .badge-master { background: var(--success); color:#fff; padding: 2px 8px; border-radius: 6px; font-size: 0.78em; }
+
+  /* Stats bars */
+  .bar-row { display: grid; grid-template-columns: 140px 1fr 80px; align-items: center; gap: 10px; padding: 6px 0; }
+  .bar-row .bar { height: 14px; background: var(--xp-bg); border-radius: 7px; overflow: hidden; border: 1px solid var(--line); }
+  .bar-row .bar > div { height: 100%; background: linear-gradient(180deg, var(--gold), var(--gold-dark)); }
+
+  /* Settings */
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed var(--line); }
+  .row:last-child { border-bottom: none; }
+  .row .lbl { font-weight: 600; }
+  .row .desc { color: var(--ink-soft); font-size: 0.88em; margin-top: 3px; }
+  .seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .seg button {
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    font: inherit;
+    color: var(--ink);
+  }
+  .seg button.on { background: var(--gold); color: #fff; }
+
+  /* Level-up overlay */
+  #levelup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: grid;
+    place-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  #levelup-overlay.show { opacity: 1; pointer-events: auto; }
+  .levelup-card {
+    background: linear-gradient(160deg, #fff3d6, #f5d98a);
+    border: 4px solid var(--gold-dark);
+    border-radius: 18px;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(224,168,48,0.6), var(--shadow);
+    transform: scale(0.6);
+    transition: transform 0.4s cubic-bezier(.3,1.6,.5,1);
+  }
+  #levelup-overlay.show .levelup-card { transform: scale(1); }
+  .levelup-card .ttl { font-size: 1.4rem; color: var(--gold-dark); letter-spacing: 0.12em; font-weight: 700; }
+  .levelup-card .big { font-size: 3.2rem; font-weight: 900; color: var(--gold-dark); margin: 10px 0; }
+  .levelup-card .reward { color: #6b5e4a; margin-top: 8px; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.92em;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.25s;
+    z-index: 200;
+    pointer-events: none;
+    box-shadow: var(--shadow);
+  }
+  #toast.show { opacity: 1; transform: none; }
+
+  /* Mode banner */
+  .mode-banner {
+    background: var(--bg-soft);
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    font-size: 0.92em;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .mode-banner strong { color: var(--ink); }
+
+  details.subject-filter { margin-bottom: 14px; }
+  details.subject-filter summary { cursor: pointer; padding: 8px 0; color: var(--blue); font-weight: 600; }
+  details.subject-filter .choices { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
+  details.subject-filter .choices label {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  details.subject-filter .choices input { margin-right: 6px; }
+
+  footer {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.82em;
+    padding: 30px 10px;
+  }
+</style>
+</head>
+<body>
+
+<!--
+  經建勇者 · 上榜教練 v3 學習遊戲
+  依據「高普考RPG遊戲需求規格書 v1.0」設計並調整為單一 HTML 檔版本。
+  題庫已改為依使用者提供之 110-114 年高普考／地特經建行政考古題整理。
+  其中選擇題為官方真題；申論題則拆解為重點知識選擇題，供練習使用。
+-->
+
+<header class="topbar">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#c9a24a"/><path d="M20 44 L32 16 L44 44 L32 36 Z" fill="#fffdf5"/><circle cx="32" cy="42" r="3" fill="#8a6a1f"/></svg>
+    <span>經建勇者 · 上榜教練 v3</span>
+  </div>
+  <nav id="nav">
+    <button data-nav="home" class="active">主畫面</button>
+    <button data-nav="quiz">開始答題</button>
+    <button data-nav="character">角色</button>
+    <button data-nav="wrongbook" data-req="wrongBook">錯題本</button>
+    <button data-nav="stats">統計</button>
+    <button data-nav="settings">設定</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="screen-home" class="screen active">
+    <div class="card">
+      <div class="hero">
+        <div class="avatar-wrap" id="avatar-wrap">
+          <!-- Character SVG -->
+          <svg viewBox="0 0 120 120" aria-label="角色">
+            <defs>
+              <linearGradient id="cloak" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#3a5f86"/>
+                <stop offset="1" stop-color="#2f5d86"/>
+              </linearGradient>
+            </defs>
+            <!-- body -->
+            <path d="M30 100 Q30 70 60 70 Q90 70 90 100 Z" fill="url(#cloak)"/>
+            <!-- face -->
+            <circle cx="60" cy="52" r="20" fill="#f6d6aa"/>
+            <!-- hair -->
+            <path d="M40 48 Q42 28 60 28 Q78 28 80 48 Q72 38 60 38 Q48 38 40 48 Z" fill="#3a2a1a"/>
+            <!-- eyes -->
+            <circle cx="53" cy="54" r="2" fill="#2a1a0a"/>
+            <circle cx="67" cy="54" r="2" fill="#2a1a0a"/>
+            <!-- smile -->
+            <path d="M55 62 Q60 66 65 62" stroke="#8a3a1f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- hat/book -->
+            <rect x="40" y="78" width="40" height="16" rx="2" fill="#c9a24a"/>
+            <rect x="40" y="78" width="40" height="3" fill="#8a6a1f"/>
+            <text x="60" y="90" text-anchor="middle" font-size="8" fill="#fffdf5" font-weight="700">考古題</text>
+          </svg>
+        </div>
+        <div class="info">
+          <span class="level-badge" id="home-lv">Lv.1</span>
+          <div class="title" id="home-title">見習考生</div>
+          <div class="sub" id="home-stage-hint">新手期 · 題目以基礎概念為主</div>
+          <div class="xpbar">
+            <div class="fill" id="home-xpfill" style="width:0%"></div>
+            <div class="label" id="home-xplabel">0 / 100 EXP</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="stat-box"><div class="n" id="stat-today">0</div><div class="l">今日已答題</div></div>
+        <div class="stat-box"><div class="n" id="stat-total">0</div><div class="l">總答題數</div></div>
+        <div class="stat-box"><div class="n" id="stat-rate">—</div><div class="l">整體答對率</div></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" data-nav-btn="quiz">⚔️  開始答題</button>
+        <button class="btn ghost" data-nav-btn="wrongbook" data-req="wrongBook">📘 錯題本</button>
+        <button class="btn ghost" data-nav-btn="stats">📊 統計數據</button>
+        <button class="btn ghost" data-nav-btn="character">🧙 角色</button>
+        <button class="btn ghost" data-nav-btn="settings">⚙️  設定</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>遊戲玩法</h3>
+      <p class="muted" style="margin:0">答題獲得 EXP，累積升級可解鎖更多功能。本版改成「上榜教練版」：除了真題選擇題，也加入大量依 110–114 年申論題拆解出的重點選擇題。每題不只給答案，還會顯示「申論連結 / 作答步驟 / 易錯點」，幫你把選擇題做成申論底層能力。關閉瀏覽器前進度會自動存在本機，亦可從「設定」頁匯出備份。</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="screen-quiz" class="screen">
+    <div class="mode-banner" id="quiz-mode-banner"></div>
+
+    <details class="subject-filter" id="subject-filter-wrap" hidden>
+      <summary>🎯 選擇科目（Lv.10 解鎖自由切換）</summary>
+      <div class="choices" id="subject-choices"></div>
+    </details>
+
+    <div class="card" id="quiz-card">
+      <div class="qtop">
+        <span class="chip subject" id="q-subject">—</span>
+        <span class="chip diff" id="q-diff">—</span>
+        <span class="chip year" id="q-year">—</span>
+        <span class="chip" id="q-type">—</span>
+        <span class="chip" id="q-counter">—</span>
+      </div>
+      <div class="question-text" id="q-text">點選「開始答題」即將載入第一題…</div>
+      <div class="options" id="q-options"></div>
+      <div id="q-hint-area"></div>
+      <div id="q-feedback-area"></div>
+      <div id="q-explain-area"></div>
+      <div class="qtools">
+        <button class="btn ghost" id="btn-hint">💡 提示</button>
+        <button class="btn" id="btn-next" disabled>下一題 ▶</button>
+        <button class="btn ghost" id="btn-back-home">回主畫面</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHARACTER ============ -->
+  <section id="screen-character" class="screen">
+    <div class="card">
+      <h1 id="char-title">🧙 見習考生 · Lv.1</h1>
+      <p class="muted" id="char-sub">累積經驗以升等，解鎖更多學習功能。</p>
+      <div class="xpbar" style="margin-top:8px">
+        <div class="fill" id="char-xpfill" style="width:0%"></div>
+        <div class="label" id="char-xplabel">0 / 100 EXP</div>
+      </div>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="stat-box"><div class="n" id="char-total-exp">0</div><div class="l">累計 EXP</div></div>
+        <div class="stat-box"><div class="n" id="char-total-ans">0</div><div class="l">累計答題</div></div>
+        <div class="stat-box"><div class="n" id="char-rate">—</div><div class="l">答對率</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>升等里程碑</h3>
+      <ul class="unlocks" id="unlock-list"></ul>
+    </div>
+  </section>
+
+  <!-- ============ WRONG BOOK ============ -->
+  <section id="screen-wrongbook" class="screen">
+    <div class="card">
+      <h1>📘 錯題本</h1>
+      <p class="muted">重新練習答錯過的題目，答對後會標為「已掌握」。</p>
+      <div id="wrongbook-list" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section id="screen-stats" class="screen">
+    <div class="card">
+      <h1>📊 統計數據</h1>
+      <p class="muted" id="stats-note">基本統計任何時候可看；Lv.20 解鎖各科目弱點分析。</p>
+      <div class="grid-3" style="margin-top:14px">
+        <div class="stat-box"><div class="n" id="s-total">0</div><div class="l">總答題</div></div>
+        <div class="stat-box"><div class="n" id="s-correct">0</div><div class="l">答對</div></div>
+        <div class="stat-box"><div class="n" id="s-rate">—</div><div class="l">答對率</div></div>
+      </div>
+    </div>
+
+    <div class="card" id="weakness-card">
+      <h3>各科目答對率</h3>
+      <div id="subject-bars"></div>
+      <p class="muted" id="weakness-lock" style="margin-top:10px">🔒 Lv.20 解鎖完整弱點分析（目前僅顯示已答題科目的概況）。</p>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="screen-settings" class="screen">
+    <div class="card">
+      <h1>⚙️ 設定</h1>
+      <div class="row">
+        <div>
+          <div class="lbl">外觀主題</div>
+          <div class="desc">淺色 / 深色模式</div>
+        </div>
+        <div class="seg" id="seg-theme">
+          <button data-theme="light">淺色</button>
+          <button data-theme="dark">深色</button>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="lbl">字體大小</div>
+          <div class="desc">14pt / 16pt / 18pt</div>
+        </div>
+        <div class="seg" id="seg-font">
+          <button data-font="14px">14</button>
+          <button data-font="16px">16</button>
+          <button data-font="18px">18</button>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="lbl">匯出進度</div>
+          <div class="desc">下載一份 JSON 備份，可在其他裝置匯入。</div>
+        </div>
+        <button class="btn ghost" id="btn-export">💾 匯出</button>
+      </div>
+      <div class="row">
+        <div>
+          <div class="lbl">匯入進度</div>
+          <div class="desc">讀取之前匯出的 JSON 檔，覆蓋目前進度。</div>
+        </div>
+        <div>
+          <input type="file" id="file-import" accept="application/json" style="display:none">
+          <button class="btn ghost" id="btn-import">📂 選檔匯入</button>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="lbl">重置進度</div>
+          <div class="desc">刪除本機所有紀錄，回到 Lv.1 從頭開始。</div>
+        </div>
+        <button class="btn danger" id="btn-reset">🗑️ 重置</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>關於</h3>
+      <p class="muted">本遊戲為「高普考經建行政」題型學習輔助工具，本版本題庫已依使用者提供之 110-114 年考古題重建。選擇題包含官方題幹；申論題則拆解為重點知識點選擇題。仍可於 <code>QUESTIONS</code> 陣列擴充。</p>
+    </div>
+  </section>
+
+</main>
+
+<div id="levelup-overlay">
+  <div class="levelup-card">
+    <div class="ttl">⭐ LEVEL UP ⭐</div>
+    <div class="big" id="lu-new-lv">Lv.2</div>
+    <div class="reward" id="lu-reward">新手之路開啟！</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<footer>
+  <div>經建勇者 v3 · 176 題 · 單機執行 · 進度存於本機瀏覽器</div>
+</footer>
+
+<script>
+/* =========================================================
+ * 1) 題庫 (QUESTIONS) — 66 題
+ * 欄位對應規格書 2.2。difficulty 1/2/3 = 新手/中階/高手。
+ * 題庫混合：經濟學/概要真題選擇題 + 110–114 年公共經濟學、貨幣銀行學、統計學申論拆解題。
+ * ========================================================= */
+const QUESTIONS = [
+  {
+    "id": 1,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等公共經濟學題意，所謂「技術性外部性」最適合指下列何者？",
+    "option_a": "某廠商的行為直接改變他人的生產或效用函數",
+    "option_b": "價格變動透過市場訊號改變他人福利",
+    "option_c": "所得重分配造成消費改變",
+    "option_d": "稅率調整造成預算限制改變",
+    "correct_answer": "A",
+    "hint": "想想外部性的核心是不是直接影響他人的技術或效用條件。",
+    "explanation": "① 正確答案：A。技術性外部性是經濟主體的行為直接影響他人的生產函數或效用函數。② B 屬金融性外部性，主要透過價格機制傳遞。",
+    "topic_tags": [
+      "外部性",
+      "技術性外部性"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 2,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等公共經濟學題意，下列何者最符合「金融性外部性（pecuniary externality）」？",
+    "option_a": "某產業需求上升推高原料價格，影響其他廠商成本",
+    "option_b": "污染直接降低居民健康",
+    "option_c": "新技術外溢提高其他廠商生產力",
+    "option_d": "疫苗接種形成群體免疫",
+    "correct_answer": "A",
+    "hint": "關鍵字是透過價格，而不是直接改變生產或效用。",
+    "explanation": "① 正確答案：A。金融性外部性是藉由市場價格變動間接影響他人。② B、C、D 都屬較典型的直接外部效果。",
+    "topic_tags": [
+      "外部性",
+      "金融性外部性"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 3,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等公共經濟學題意，若某外部效果只是金融性外部性，政府通常應如何看待？",
+    "option_a": "原則上不必像技術性外部性那樣直接矯正",
+    "option_b": "一定課徵庇古稅",
+    "option_c": "一定補貼受影響者",
+    "option_d": "全面價格管制",
+    "correct_answer": "A",
+    "hint": "先分清：這是不是市場失靈，還是只是價格調整。",
+    "explanation": "① 正確答案：A。金融性外部性通常只是市場價格調整結果，不必然代表資源配置無效率。",
+    "topic_tags": [
+      "外部性",
+      "政府介入"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 4,
+    "year": 110,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 110 年高考三級公共經濟學題意，在單峰偏好且採兩兩投票程序時，投票結果通常會反映誰的偏好？",
+    "option_a": "平均選民",
+    "option_b": "中位數投票者",
+    "option_c": "最富有投票者",
+    "option_d": "偏好最極端者",
+    "correct_answer": "B",
+    "hint": "這是公共選擇中的經典結論。",
+    "explanation": "① 正確答案：B。單峰偏好下，多數決的勝出方案通常反映中位數投票者偏好。",
+    "topic_tags": [
+      "中位數投票者",
+      "多數決"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 5,
+    "year": 110,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 110 年高考三級公共經濟學題意，吉尼係數愈接近 0，代表：",
+    "option_a": "所得分配愈平均",
+    "option_b": "所得分配愈不平均",
+    "option_c": "政府規模愈大",
+    "option_d": "租稅負擔愈重",
+    "correct_answer": "A",
+    "hint": "回想羅倫茲曲線與完全均等線之間的關係。",
+    "explanation": "① 正確答案：A。吉尼係數愈接近 0，表示愈平等；愈接近 1，表示愈不平等。",
+    "topic_tags": [
+      "所得分配",
+      "吉尼係數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 6,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 111 年地特三等公共經濟學題意，教育市場與醫療保險市場容易出現市場失靈的重要共同原因之一是：",
+    "option_a": "資訊不對稱",
+    "option_b": "完全競爭太強",
+    "option_c": "規模報酬遞減",
+    "option_d": "貨幣需求不穩定",
+    "correct_answer": "A",
+    "hint": "想想醫療與教育都有資訊掌握不對等。",
+    "explanation": "① 正確答案：A。教育與醫療保險市場都常有資訊不對稱問題。",
+    "topic_tags": [
+      "市場失靈",
+      "資訊不對稱"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 7,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 111 年地特三等公共經濟學題意，滿足 Samuelson 條件時，公共財的最適供給原則為：",
+    "option_a": "個別邊際利益相加後等於邊際成本",
+    "option_b": "平均邊際利益等於邊際成本",
+    "option_c": "最高邊際利益等於邊際成本",
+    "option_d": "中位數邊際利益等於邊際成本",
+    "correct_answer": "A",
+    "hint": "公共財需求要做哪一種加總，是水平還是垂直？",
+    "explanation": "① 正確答案：A。公共財最適供給是各人邊際利益垂直加總後等於邊際成本。",
+    "topic_tags": [
+      "公共財",
+      "Samuelson條件"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 8,
+    "year": 112,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 112 年地特三等公共經濟學題意，選民透過交換支持以促成各自偏好政策通過，稱為：",
+    "option_a": "換票（logrolling）",
+    "option_b": "租稅資本化",
+    "option_c": "搭便車",
+    "option_d": "逆選擇",
+    "correct_answer": "A",
+    "hint": "這是公共選擇理論常見名詞。",
+    "explanation": "① 正確答案：A。logrolling 指選民或政治人物彼此交換支持。",
+    "topic_tags": [
+      "公共選擇",
+      "logrolling"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 9,
+    "year": 112,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 112 年地特三等公共經濟學題意，林達爾均衡的核心精神是：",
+    "option_a": "每個人依其邊際受益分擔公共財價格",
+    "option_b": "每個人面對相同稅價",
+    "option_c": "政府完全免費提供公共財",
+    "option_d": "由中位數投票者決定價格",
+    "correct_answer": "A",
+    "hint": "林達爾價格是依受益分攤。",
+    "explanation": "① 正確答案：A。林達爾均衡讓每個人依受益程度承擔個別化價格，使公共財供給達到效率。",
+    "topic_tags": [
+      "林達爾均衡",
+      "公共財"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 前提 → 結論 → 一句限制或例外。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 10,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 113 年地特三等公共經濟學題意，若污染廠商造成的邊際外部傷害 MD(Q)=10，最適庇古稅率通常應設定為：",
+    "option_a": "10",
+    "option_b": "0",
+    "option_c": "等於平均成本",
+    "option_d": "等於總稅收",
+    "correct_answer": "A",
+    "hint": "庇古稅抓的是邊際外部傷害。",
+    "explanation": "① 正確答案：A。最適污染稅率應等於社會最適產量下的邊際外部傷害；本題 MD 為常數 10，因此 t*=10。",
+    "topic_tags": [
+      "污染稅",
+      "庇古稅"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論高分關鍵句：最適稅率應等於社會最適產量下的邊際外部損害。",
+    "trap_point": "最常見失分是把效率與公平混在一起。"
+  },
+  {
+    "id": 11,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等貨幣銀行學題意，6 年期零息債券的平均存續期間（duration）為：",
+    "option_a": "等於 6 年",
+    "option_b": "小於 6 年",
+    "option_c": "大於 6 年",
+    "option_d": "不一定",
+    "correct_answer": "A",
+    "hint": "零息債券所有現金流在何時一次收到？",
+    "explanation": "① 正確答案：A。零息債券只有到期時一筆現金流，因此 Macaulay duration 等於到期期限。",
+    "topic_tags": [
+      "duration",
+      "債券"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 12,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等貨幣銀行學題意，銀行納入次順位債作為資本的反對理由之一是：",
+    "option_a": "它本質仍屬負債，吸收損失能力不如普通股權",
+    "option_b": "它完全沒有違約風險",
+    "option_c": "它流動性一定高於存款",
+    "option_d": "它不需支付利息",
+    "correct_answer": "A",
+    "hint": "先分清資本與負債的吸損能力。",
+    "explanation": "① 正確答案：A。次順位債雖可在一定程度吸收損失，但終究是負債，和普通股不同。",
+    "topic_tags": [
+      "銀行資本",
+      "次順位債"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 13,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等貨幣銀行學題意，Basel III 相較 Basel II 強化的重點不包括下列何者？",
+    "option_a": "完全取消資本適足率觀念",
+    "option_b": "提高資本品質與數量要求",
+    "option_c": "新增流動性監理要求",
+    "option_d": "增訂槓桿比率規範",
+    "correct_answer": "A",
+    "hint": "Basel III 是強化，不是取消。",
+    "explanation": "① 正確答案：A。Basel III 並未取消資本適足率，而是強化資本、流動性與槓桿監理。",
+    "topic_tags": [
+      "Basel III",
+      "金融監理"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 14,
+    "year": 110,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 110 年高考三級貨幣銀行學題意，CBDC 與一般民間電子支付工具的主要差異之一是：",
+    "option_a": "CBDC 是中央銀行負債，民間電子支付通常不是",
+    "option_b": "CBDC 不是貨幣",
+    "option_c": "電子支付一定可支付準備金利息",
+    "option_d": "電子支付可以直接取代所有銀行存款",
+    "correct_answer": "A",
+    "hint": "誰發行、誰負責，是關鍵差異。",
+    "explanation": "① 正確答案：A。CBDC 屬央行負債，具有官方支付屬性；民間電子支付通常是私人機構發行的支付工具。",
+    "topic_tags": [
+      "CBDC",
+      "支付制度"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 15,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 111 年地特三等貨幣銀行學題意，下列何者最符合金融危機中的「資產負債表效應」？",
+    "option_a": "資產價格下跌使淨值惡化，進一步削弱借款與投資能力",
+    "option_b": "貨幣需求增加使物價下降",
+    "option_c": "政府支出擴張使乘數上升",
+    "option_d": "出口增加使外匯存底增加",
+    "correct_answer": "A",
+    "hint": "核心是淨值惡化與外部融資更困難。",
+    "explanation": "① 正確答案：A。資產負債表效應指資產價格、匯率、利率變動衝擊借款者淨值，惡化逆選擇與道德風險。",
+    "topic_tags": [
+      "金融危機",
+      "資產負債表效應"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 16,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 111 年地特三等貨幣銀行學題意，銀行貼現業務最接近下列何者？",
+    "option_a": "銀行以折價方式買入未到期票據",
+    "option_b": "銀行向央行繳納保險費",
+    "option_c": "銀行將不良債權全部註銷",
+    "option_d": "央行直接買股票",
+    "correct_answer": "A",
+    "hint": "貼現的主體是票據，重點是未到期、折價購入。",
+    "explanation": "① 正確答案：A。貼現是銀行以票面金額扣除利息後，先行買入未到期票據。",
+    "topic_tags": [
+      "貼現",
+      "票據市場"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 17,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 111 年地特三等貨幣銀行學題意，春節期間公眾持有現金增加，通常對貨幣乘數的影響為何？",
+    "option_a": "下降",
+    "option_b": "上升",
+    "option_c": "不變",
+    "option_d": "先升後降必然成立",
+    "correct_answer": "A",
+    "hint": "通貨對存款比率提高，對乘數通常怎樣？",
+    "explanation": "① 正確答案：A。公眾持有更多現金會提高通貨／存款比率，通常使貨幣乘數下降。",
+    "topic_tags": [
+      "貨幣乘數",
+      "現金漏出"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 18,
+    "year": 111,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 111 年高考三級貨幣銀行學題意，若殖利率曲線出現倒掛，常被解讀為：",
+    "option_a": "市場預期未來景氣轉弱或政策利率將下降",
+    "option_b": "通膨一定永久消失",
+    "option_c": "銀行放款需求一定增加",
+    "option_d": "貨幣乘數一定上升",
+    "correct_answer": "A",
+    "hint": "倒掛常被視為景氣訊號。",
+    "explanation": "① 正確答案：A。倒掛殖利率曲線常反映市場預期未來經濟走弱、短率回落。",
+    "topic_tags": [
+      "殖利率曲線",
+      "景氣預期"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 19,
+    "year": 112,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 112 年地特三等貨幣銀行學題意，中央銀行賣出國庫券且銀行準備金減少，屬於：",
+    "option_a": "公開市場賣出，意在減少貨幣供給",
+    "option_b": "公開市場買進，意在增加貨幣供給",
+    "option_c": "貼現放款，意在增加流動性",
+    "option_d": "存款保險理賠",
+    "correct_answer": "A",
+    "hint": "資產與準備金同減，表示央行在做什麼？",
+    "explanation": "① 正確答案：A。央行公開市場賣出證券，收回資金，會使銀行準備金與貨幣供給下降。",
+    "topic_tags": [
+      "公開市場操作",
+      "準備金"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 20,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 113 年高考三級貨幣銀行學題意，若股市交易特別活絡而觀察到 M1B 上升、M2 下降，最可能是因為：",
+    "option_a": "定期性存款轉入活期性存款",
+    "option_b": "現金全面退出流通",
+    "option_c": "央行直接註銷準備金",
+    "option_d": "出口全部停滯",
+    "correct_answer": "A",
+    "hint": "M1B 與 M2 差在哪些成分？",
+    "explanation": "① 正確答案：A。M1B 含活期性存款，M2 另含準貨幣；若資金由定存移向活存投入股市，可能使 M1B 升、M2 降。",
+    "topic_tags": [
+      "M1B",
+      "M2"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷這題屬於哪個框架：貨幣定義、利率風險、銀行資產負債、IS-LM/AD-AS、監理制度。",
+    "essay_link": "申論最好先寫『機制』再寫『方向』，不要只背結論。",
+    "trap_point": "常見錯誤是只講現象，不講傳導鏈條。"
+  },
+  {
+    "id": 21,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等統計學題意，若要判斷一組資料是否存在異常值，常見且直觀的工具是：",
+    "option_a": "箱型圖與四分位距",
+    "option_b": "圓餅圖",
+    "option_c": "樹狀圖",
+    "option_d": "散布圖一定不可",
+    "correct_answer": "A",
+    "hint": "題目第一大題就在考偏態與異常值判斷。",
+    "explanation": "① 正確答案：A。箱型圖與 IQR 規則常用來判斷異常值。",
+    "topic_tags": [
+      "描述統計",
+      "異常值"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 22,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等統計學題意，在母體常態但母體變異數未知且樣本數很小時，檢定平均數是否大於某值，通常使用：",
+    "option_a": "t 檢定",
+    "option_b": "Z 檢定",
+    "option_c": "卡方獨立性檢定",
+    "option_d": "F 檢定",
+    "correct_answer": "A",
+    "hint": "條件是：常態、小樣本、σ 未知。",
+    "explanation": "① 正確答案：A。母體常態、σ 未知、小樣本時，平均數檢定常用單樣本 t 檢定。",
+    "topic_tags": [
+      "假設檢定",
+      "t檢定"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 23,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等統計學題意，若不良品發生服從 Poisson process，則相鄰事件發生時間通常服從：",
+    "option_a": "指數分配",
+    "option_b": "常態分配",
+    "option_c": "均勻分配",
+    "option_d": "t 分配",
+    "correct_answer": "A",
+    "hint": "Poisson process 的事件間隔時間是什麼分配？",
+    "explanation": "① 正確答案：A。Poisson process 的到達次數服從 Poisson 分配，而事件間隔時間服從指數分配。",
+    "topic_tags": [
+      "Poisson process",
+      "指數分配"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 24,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等統計學題意，檢定吸菸量與是否罹患心血管疾病有無相關，最適合使用：",
+    "option_a": "卡方獨立性檢定",
+    "option_b": "單一母體平均數 t 檢定",
+    "option_c": "成對樣本 t 檢定",
+    "option_d": "單因子變異數分析",
+    "correct_answer": "A",
+    "hint": "兩個都是類別變數。",
+    "explanation": "① 正確答案：A。吸菸習慣與是否患病皆為類別變數，常用列聯表卡方獨立性檢定。",
+    "topic_tags": [
+      "列聯表",
+      "卡方檢定"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 25,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等統計學題意，由 5 個工廠分別嘗試 3 種製程方式的設計，最接近：",
+    "option_a": "隨機區集設計",
+    "option_b": "完全隨機設計",
+    "option_c": "二因子交叉設計且無區集",
+    "option_d": "配對 t 檢定設計",
+    "correct_answer": "A",
+    "hint": "工廠扮演的是什麼角色？",
+    "explanation": "① 正確答案：A。各工廠都接受三種製程，可視工廠為區集，屬隨機區集設計。",
+    "topic_tags": [
+      "實驗設計",
+      "隨機區集設計"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 26,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等統計學題意，簡單線性迴歸中的決定係數 R² 主要衡量：",
+    "option_a": "解釋變數能解釋反應變數變異的比例",
+    "option_b": "迴歸係數一定為正",
+    "option_c": "殘差一定服從常態",
+    "option_d": "樣本數大小",
+    "correct_answer": "A",
+    "hint": "R² 是解釋力。",
+    "explanation": "① 正確答案：A。R² 表示模型解釋總變異的比例。",
+    "topic_tags": [
+      "迴歸",
+      "決定係數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 27,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 111 年地特三等統計學題意，若要比較三種肥料對平均生長高度是否不同，適合使用：",
+    "option_a": "單因子 ANOVA",
+    "option_b": "卡方適合度檢定",
+    "option_c": "二項比例檢定",
+    "option_d": "配對 t 檢定",
+    "correct_answer": "A",
+    "hint": "比較三組平均數。",
+    "explanation": "① 正確答案：A。比較三組平均數是否相同，通常使用單因子變異數分析。",
+    "topic_tags": [
+      "ANOVA",
+      "平均數比較"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先確認是多組平均數比較，再寫出 H0: 各組平均數相等。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 28,
+    "year": 113,
+    "exam_type": "普考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 113 年普考統計學概要題意，若要檢驗男女自備飲料杯比例是否不同，最常用：",
+    "option_a": "兩母體比例差檢定",
+    "option_b": "兩母體平均數 t 檢定",
+    "option_c": "單因子 ANOVA",
+    "option_d": "Poisson 檢定",
+    "correct_answer": "A",
+    "hint": "男、女有沒有自備杯，都是比例問題。",
+    "explanation": "① 正確答案：A。比較兩群體比例是否不同，通常用兩母體比例差 Z 檢定。",
+    "topic_tags": [
+      "比例檢定",
+      "兩母體比例"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 29,
+    "year": 114,
+    "exam_type": "普考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 114 年普考統計學概要題意，若檢定臺北市各姓氏比例是否與全國一致，最適合使用：",
+    "option_a": "卡方適合度檢定",
+    "option_b": "單一比例檢定",
+    "option_c": "成對 t 檢定",
+    "option_d": "F 檢定",
+    "correct_answer": "A",
+    "hint": "多類別比例與已知分配比較。",
+    "explanation": "① 正確答案：A。比較樣本類別分配是否符合既定母體分配，常用卡方適合度檢定。",
+    "topic_tags": [
+      "卡方適合度",
+      "類別資料"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先辨認資料型態與要檢定的參數，再決定方法。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 30,
+    "year": 114,
+    "exam_type": "普考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 114 年普考統計學概要題意，檢定四種流程平均辦理時間是否相等，所需的重要前提不包括：",
+    "option_a": "反應變數一定為二元類別資料",
+    "option_b": "各組樣本相互獨立",
+    "option_c": "各組母體近似常態",
+    "option_d": "各組母體變異數相同或近似相同",
+    "correct_answer": "A",
+    "hint": "ANOVA 分析的是連續型結果。",
+    "explanation": "① 正確答案：A。ANOVA 常見假設包括獨立、常態、變異數同質，不要求二元類別資料。",
+    "topic_tags": [
+      "ANOVA",
+      "模型假設"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先確認是多組平均數比較，再寫出 H0: 各組平均數相等。",
+    "essay_link": "申論順序通常是：H0/H1 → 統計量 → 拒絕域或 p 值 → 結論。",
+    "trap_point": "最常見失分是方法選對了，但假設與結論沒寫完整。"
+  },
+  {
+    "id": 31,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "相較於競爭性勞動市場的僱用量與生產量，獨買勞動市場的僱用量會____，生產____的產品。",
+    "option_a": "較低；較少",
+    "option_b": "較低；較多",
+    "option_c": "較高；較少",
+    "option_d": "較高；較多",
+    "correct_answer": "A",
+    "hint": "獨買方會壓低勞動僱用。",
+    "explanation": "① 正確答案：A。勞動獨買者僱用量低於競爭市場，因此產量也較少。",
+    "topic_tags": [
+      "勞動獨買",
+      "市場結構"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 32,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "下列那些不是公共財的特性？",
+    "option_a": "因為公共財不用付錢，所以沒有機會成本",
+    "option_b": "沒有排他性",
+    "option_c": "額外一個人的消費不會影響其他人可以消費的數量",
+    "option_d": "個人消費效益不會被其他人的消費所影響",
+    "correct_answer": "A",
+    "hint": "公共財仍然有資源成本。",
+    "explanation": "① 正確答案：A。公共財具非排他、非敵對，但仍有機會成本。",
+    "topic_tags": [
+      "公共財",
+      "基本概念"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 33,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "根據 IS-LM 模型，來自商品市場的投資支出增加時，為釘住利率不變，中央銀行可以採取下列何種政策？",
+    "option_a": "增加貨幣供給",
+    "option_b": "減少貨幣供給",
+    "option_c": "增加政府支出",
+    "option_d": "減少政府稅收",
+    "correct_answer": "A",
+    "hint": "IS 右移後若要讓利率回到原位，LM 要怎麼動？",
+    "explanation": "① 正確答案：A。投資增加使 IS 右移、利率有上升壓力；央行增加貨幣供給使 LM 右移，可維持利率不變。",
+    "topic_tags": [
+      "IS-LM",
+      "貨幣政策"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先分清是 IS 動還是 LM 動，再看哪些變數方向確定、哪些不確定。",
+    "essay_link": "申論可用：政策 → 曲線移動 → 新均衡的 i 與 Y。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 34,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "如果需求是具有彈性的，那麼下列何者正確？",
+    "option_a": "數量效果大於價格效果，價格的下降將導致總收入增加",
+    "option_b": "價格效果大於數量效果，價格的下降將導致總收入增加",
+    "option_c": "價格效果大於數量效果，價格的增加將導致總收入增加",
+    "option_d": "數量效果大於價格效果，價格的增加將導致總收入增加",
+    "correct_answer": "A",
+    "hint": "彈性需求下降價，總收益通常怎樣？",
+    "explanation": "① 正確答案：A。需求有彈性時，降價帶來的數量增加效果大於價格下降效果，總收益增加。",
+    "topic_tags": [
+      "價格彈性",
+      "總收益"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 35,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "假設廠商的成本函數為 C(q)=20+3q，其中 C 為總成本，而 q 則為總產量。下列敘述何者正確？",
+    "option_a": "此成本函數為一短期成本函數",
+    "option_b": "邊際成本函數為 3q",
+    "option_c": "平均成本函數為 3q",
+    "option_d": "固定成本函數為 3q",
+    "correct_answer": "A",
+    "hint": "因為這裡有固定成本 20。",
+    "explanation": "① 正確答案：A。有固定成本 20，故屬短期成本函數；MC=3、AC=20/q+3。",
+    "topic_tags": [
+      "成本函數",
+      "短期成本"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 36,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "當對某個活動課稅的稅額等於這個活動的外部邊際成本時，達到有效率的生產水準，是因為課稅：",
+    "option_a": "強迫生產者承擔所有的外部成本",
+    "option_b": "達到競爭均衡",
+    "option_c": "保證廠商能有更高的利潤",
+    "option_d": "消除所有污染",
+    "correct_answer": "A",
+    "hint": "這題就是庇古稅。",
+    "explanation": "① 正確答案：A。使私人邊際成本加上稅額等於社會邊際成本，達到有效率產量。",
+    "topic_tags": [
+      "外部性",
+      "庇古稅"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論高分關鍵句：最適稅率應等於社會最適產量下的邊際外部損害。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 37,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "下列何者不是中央銀行貨幣政策工具？",
+    "option_a": "調整市場匯率",
+    "option_b": "公開市場操作",
+    "option_c": "重貼現率",
+    "option_d": "法定準備率",
+    "correct_answer": "A",
+    "hint": "傳統三大工具中沒有它。",
+    "explanation": "① 正確答案：A。調整市場匯率不是通常列示的傳統貨幣政策工具。",
+    "topic_tags": [
+      "中央銀行",
+      "貨幣政策工具"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 38,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "李嘉圖均等定理（Ricardian equivalence theorem）意指：",
+    "option_a": "稅收減少並不影響消費者支出",
+    "option_b": "如果政府減少稅收並增加目前的政府支出，消費者支出將增加",
+    "option_c": "稅收減少和政府支出變化都不影響消費者支出",
+    "option_d": "稅收減少且未來政府支出減少，將減少消費者支出",
+    "correct_answer": "A",
+    "hint": "核心是債務融通減稅不改變消費。",
+    "explanation": "① 正確答案：A。在嚴格假設下，以舉債融通的減稅不改變民間消費。",
+    "topic_tags": [
+      "李嘉圖均等",
+      "財政政策"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 39,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "下列何種情況下適合使用 Stackelberg 模型而非 Cournot 模型來分析廠商之間的互動？",
+    "option_a": "廠商依照先來後到制訂產量",
+    "option_b": "當市場上有超過 2 家以上的廠商",
+    "option_c": "所有的廠商同時進入市場制訂產量",
+    "option_d": "廠商依照先來後到制訂價格",
+    "correct_answer": "A",
+    "hint": "Stackelberg 的關鍵是先行者與後行者。",
+    "explanation": "① 正確答案：A。Stackelberg 模型為序列式產量競爭。",
+    "topic_tags": [
+      "Stackelberg",
+      "寡占"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 40,
+    "year": 114,
+    "exam_type": "地特四等",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "若某小國對進口商品課徵關稅，則會使進口國該商品的國內價格 ① ，且進口的數量 ② 。",
+    "option_a": "①上漲；②減少",
+    "option_b": "①上漲；②不變",
+    "option_c": "①下跌；②不變",
+    "option_d": "①下跌；②增加",
+    "correct_answer": "A",
+    "hint": "小國關稅模型的標準結論。",
+    "explanation": "① 正確答案：A。小國課關稅會使國內價格上升，進口量下降。",
+    "topic_tags": [
+      "關稅",
+      "國際貿易"
+    ],
+    "question_type": "真題選擇",
+    "coach_step": "先判斷是個體、總體、國際、賽局或市場結構題，再選模型。",
+    "essay_link": "申論最好先點出核心模型，再寫方向與原因。",
+    "trap_point": "不要只背答案方向，忽略為什麼。"
+  },
+  {
+    "id": 41,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 112 年高考三級公共經濟學考題，位於總效用可能曲線上的配置，最能直接推出的是：",
+    "option_a": "一定最公平",
+    "option_b": "一定社會福利極大",
+    "option_c": "在既定條件下已具柏拉圖效率",
+    "option_d": "政府規模最適",
+    "correct_answer": "C",
+    "hint": "曲線上的意義先想『效率』。",
+    "explanation": "① 正確答案：C。位於總效用可能曲線上代表已無法在不使他人變差下讓某人更好。② 但這不代表分配公平，也不代表某特定社會福利函數已極大。",
+    "topic_tags": [
+      "總效用可能曲線",
+      "柏拉圖效率"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "看到 frontier 題，先問『代表效率還是公平』。",
+    "essay_link": "申論時可多補一句：公平性仍需額外價值判準。",
+    "trap_point": "把有效率誤寫成最公平。"
+  },
+  {
+    "id": 42,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 112 年高考三級公共經濟學考題，福利經濟學第一基本定理最核心在說明：",
+    "option_a": "重分配一定有效率",
+    "option_b": "競爭均衡在若干條件下可達柏拉圖效率",
+    "option_c": "政府規模越小越好",
+    "option_d": "市場永不失靈",
+    "correct_answer": "B",
+    "hint": "第一定理講的是競爭均衡與效率。",
+    "explanation": "① 正確答案：B。第一基本定理主張，在完全競爭、無外部性等條件下，競爭均衡可達柏拉圖效率。",
+    "topic_tags": [
+      "第一基本定理",
+      "競爭均衡"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清第一定理和第二定理。",
+    "essay_link": "第一定理講效率；第二定理講分配與效率可分離。",
+    "trap_point": "把兩個定理記反。"
+  },
+  {
+    "id": 43,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 113 年高考三級公共經濟學考題，若平分成本的多數決結果與 Lindahl 均衡不同，主因是：",
+    "option_a": "Lindahl 依個人受益設計價格，平分成本沒有",
+    "option_b": "Lindahl 忽略需求",
+    "option_c": "多數決一定最有效率",
+    "option_d": "兩者一定會相同",
+    "correct_answer": "A",
+    "hint": "誰付多少，是這題核心。",
+    "explanation": "① 正確答案：A。Lindahl 均衡允許每個人面對不同的個別價格，因此能反映受益差異；平分成本則忽略此差異。",
+    "topic_tags": [
+      "Lindahl均衡",
+      "多數決"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先比較兩種制度如何分攤成本。",
+    "essay_link": "申論可寫：差異來自價格個別化與否。",
+    "trap_point": "只說 Lindahl 有效率，卻說不出原因。"
+  },
+  {
+    "id": 44,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 114 年地特三等公共經濟學考題，從價格效果來看，GDP 成長時政府支出占比上升的一個理由是：",
+    "option_a": "公共服務相對價格可能上升",
+    "option_b": "公共服務一定變便宜",
+    "option_c": "公共支出一定固定",
+    "option_d": "民間需求一定下降",
+    "correct_answer": "A",
+    "hint": "價格效果通常要想到成本病。",
+    "explanation": "① 正確答案：A。若政府提供的許多服務屬勞動密集部門，生產力進步慢但工資隨整體經濟上升，則相對價格上升。",
+    "topic_tags": [
+      "Wagner法則",
+      "價格效果"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把 Wagner 拆成『所得效果』與『價格效果』。",
+    "essay_link": "可接包莫爾成本病一起寫。",
+    "trap_point": "只寫需求增加，漏掉相對價格。"
+  },
+  {
+    "id": 45,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 114 年地特三等公共經濟學考題，Niskanen 預算極大化模型中，官僚決定的預算可能高於社會最適，關鍵原因是：",
+    "option_a": "官僚完全追求公共利益",
+    "option_b": "立法者掌握完整資訊",
+    "option_c": "官僚具有資訊優勢且追求部門規模",
+    "option_d": "市場自動矯正",
+    "correct_answer": "C",
+    "hint": "抓住『資訊優勢＋部門目標』。",
+    "explanation": "① 正確答案：C。官僚常有資訊優勢，若又追求更大的預算與部門規模，便可能使預算超出社會福利最大的水準。",
+    "topic_tags": [
+      "Niskanen",
+      "預算極大化"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "這題要寫機制，不只寫價值評斷。",
+    "essay_link": "申論作答可用：社會最適 vs 官僚目標 → 為何偏離。",
+    "trap_point": "只罵官僚，不寫模型。"
+  },
+  {
+    "id": 46,
+    "year": 114,
+    "exam_type": "高考三級",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 114 年高考三級公共經濟學考題，Ramsey Rule 支持擴大稅基的重要效率理由是：",
+    "option_a": "將稅集中在少數商品可減少扭曲",
+    "option_b": "在既定稅收下分散課稅可降低超額負擔",
+    "option_c": "稅基越小越公平",
+    "option_d": "擴大稅基與彈性無關",
+    "correct_answer": "B",
+    "hint": "窄稅基通常要配高稅率。",
+    "explanation": "① 正確答案：B。若只對少數商品重稅，會造成較大扭曲；擴大稅基能在既定稅收下分散負擔、降低超額負擔。",
+    "topic_tags": [
+      "Ramsey Rule",
+      "擴大稅基"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "申論可從『稅率過高造成扭曲』切入。",
+    "essay_link": "最後再補一句：效率與公平仍須兼顧。",
+    "trap_point": "把擴大稅基只寫成增加收入。"
+  },
+  {
+    "id": 47,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 112 年高考三級統計學考題，若 X~Exp(λ)，則 E(X) 應為：",
+    "option_a": "λ",
+    "option_b": "1/λ",
+    "option_c": "λ²",
+    "option_d": "1/λ²",
+    "correct_answer": "B",
+    "hint": "指數分配平均數是速率的倒數。",
+    "explanation": "① 正確答案：B。若用 rate 參數 λ 表示，則 E(X)=1/λ。",
+    "topic_tags": [
+      "指數分配",
+      "期望值"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先確認參數化方式。",
+    "essay_link": "申論如符號可能混淆，可主動註明 λ 為 rate。",
+    "trap_point": "把 rate 和 mean 記反。"
+  },
+  {
+    "id": 48,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 112 年高考三級統計學考題，若 X1,…,Xn 為 iid Exp(λ)，則 Y=ΣXi 最適合的分配名稱為：",
+    "option_a": "二項分配",
+    "option_b": "Gamma 分配",
+    "option_c": "常態分配",
+    "option_d": "Poisson 分配",
+    "correct_answer": "B",
+    "hint": "多個指數相加。",
+    "explanation": "① 正確答案：B。獨立同參數的指數分配相加會形成 Gamma 分配。",
+    "topic_tags": [
+      "Gamma分配",
+      "動差母函數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "這題標準做法是先求 MGF，再對照分配。",
+    "essay_link": "申論不要只寫名稱，最好寫出 MGF。",
+    "trap_point": "知道結果卻不會推導。"
+  },
+  {
+    "id": 49,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 113 年地特三等統計學考題，要檢定同一批學生使用創新教學法前後成績是否上升，最適合用：",
+    "option_a": "兩獨立樣本 t 檢定",
+    "option_b": "成對樣本 t 檢定",
+    "option_c": "單因子 ANOVA",
+    "option_d": "卡方獨立性檢定",
+    "correct_answer": "B",
+    "hint": "同一批學生前後比較。",
+    "explanation": "① 正確答案：B。前後測資料來自同一批學生，應分析差異值的平均是否大於 0。",
+    "topic_tags": [
+      "成對樣本t檢定",
+      "前後測"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先看資料是否一一配對。",
+    "essay_link": "申論要把 d=後-前 定義清楚。",
+    "trap_point": "把前後測當兩獨立樣本。"
+  },
+  {
+    "id": 50,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 113 年高考三級統計學考題，投資組合期望報酬率的計算方式最接近：",
+    "option_a": "把各資產報酬率標準差相加",
+    "option_b": "依投資比重對各資產平均報酬做加權平均",
+    "option_c": "取最高報酬資產的平均數",
+    "option_d": "只能用模擬法",
+    "correct_answer": "B",
+    "hint": "平均數先看權重。",
+    "explanation": "① 正確答案：B。投資組合的期望報酬率為各資產期望報酬率的加權平均。",
+    "topic_tags": [
+      "投資組合",
+      "期望值"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把平均數和變異數公式分開。",
+    "essay_link": "若題目延伸風險，記得還要加上共變異項。",
+    "trap_point": "平均數和風險都用同一套公式。"
+  },
+  {
+    "id": 51,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 114 年地特三等統計學考題，若 Y 表示抽到第 10 位近視者時所需抽樣人數，Y 的分配最適合是：",
+    "option_a": "幾何分配",
+    "option_b": "負二項分配",
+    "option_c": "二項分配",
+    "option_d": "常態分配",
+    "correct_answer": "B",
+    "hint": "第 r 次成功落在第幾次試驗。",
+    "explanation": "① 正確答案：B。負二項分配描述第 r 次成功出現在第幾次試驗。",
+    "topic_tags": [
+      "負二項分配",
+      "等待時間"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "第 1 次成功是 geometric；第 r 次成功是 negative binomial。",
+    "essay_link": "申論若能寫 PMF 會更穩。",
+    "trap_point": "一看到等待時間就只想到 geometric。"
+  },
+  {
+    "id": 52,
+    "year": 114,
+    "exam_type": "高考三級",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "依 114 年高考三級統計學考題，在固定顯著水準下，把樣本數從 36 提高到 100，通常會使檢定力：",
+    "option_a": "下降",
+    "option_b": "不變",
+    "option_c": "上升",
+    "option_d": "必定等於 1",
+    "correct_answer": "C",
+    "hint": "n 變大，標準誤通常下降。",
+    "explanation": "① 正確答案：C。樣本數增加通常會降低標準誤，從而降低型 II 誤差、提高檢定力。",
+    "topic_tags": [
+      "檢定力",
+      "樣本數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "power 題要一起想 α、效果量、σ、n。",
+    "essay_link": "申論可補：檢定力上升通常伴隨 β 下降。",
+    "trap_point": "把顯著水準和檢定力混為同一件事。"
+  },
+  {
+    "id": 53,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 112 年高考三級貨幣銀行學考題，升息抑制通膨的最直接總體機制之一是：",
+    "option_a": "提高借貸成本，壓抑投資與總需求",
+    "option_b": "提高政府支出",
+    "option_c": "讓貨幣需求必然下降",
+    "option_d": "使工資立刻下降到零",
+    "correct_answer": "A",
+    "hint": "從 AD 角度想。",
+    "explanation": "① 正確答案：A。升息提高資金成本，通常抑制投資與耐久財消費，進而抑制總需求與通膨。",
+    "topic_tags": [
+      "升息",
+      "通膨"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先寫利率管道，再補預期與信用管道。",
+    "essay_link": "申論不要只說『少花錢』，要寫傳導過程。",
+    "trap_point": "只寫結論不寫機制。"
+  },
+  {
+    "id": 54,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 112 年高考三級貨幣銀行學考題，若升息導致銀行持有的長天期債券市價下跌，這主要反映：",
+    "option_a": "信用風險",
+    "option_b": "利率風險",
+    "option_c": "作業風險",
+    "option_d": "匯率風險",
+    "correct_answer": "B",
+    "hint": "債券價格對利率很敏感。",
+    "explanation": "① 正確答案：B。市場利率上升會使既有固定收益資產價格下跌，銀行若持有大量長天期債券，會承受利率風險。",
+    "topic_tags": [
+      "利率風險",
+      "銀行資產"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "申論可接：當流動性壓力來時，利率風險會轉成實現損失。",
+    "essay_link": "這能再連到流動性風險。",
+    "trap_point": "只把銀行風險理解成信用違約。"
+  },
+  {
+    "id": 55,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 113 年地特三等貨幣銀行學考題，若同時採緊縮貨幣與擴張財政政策，在 IS-LM 中較確定的結果是：",
+    "option_a": "利率有上升壓力",
+    "option_b": "利率一定下降",
+    "option_c": "所得一定上升",
+    "option_d": "物價一定不變",
+    "correct_answer": "A",
+    "hint": "先看共同方向。",
+    "explanation": "① 正確答案：A。IS 右移與 LM 左移都會推升利率；所得效果則取決於兩者相對幅度。",
+    "topic_tags": [
+      "IS-LM",
+      "政策組合"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分『確定』與『不確定』。",
+    "essay_link": "申論可先說 i 確定上升，Y 視幅度而定。",
+    "trap_point": "硬要對 Y 下絕對結論。"
+  },
+  {
+    "id": 56,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 113 年高考三級貨幣銀行學考題，M1B 與 M2 的差異最核心在於：",
+    "option_a": "M2 比 M1B 少了活期性存款",
+    "option_b": "M2 除 M1B 外還包含較廣義的準貨幣",
+    "option_c": "兩者完全相同",
+    "option_d": "M1B 包含所有金融資產",
+    "correct_answer": "B",
+    "hint": "M2 比 M1B 更廣。",
+    "explanation": "① 正確答案：B。M2 是較廣義的貨幣供給概念，除 M1B 外還包含定存等準貨幣。",
+    "topic_tags": [
+      "M1B",
+      "M2"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先背定義，再解釋資金搬家的方向。",
+    "essay_link": "這題很適合用『定存轉活存』作例子。",
+    "trap_point": "只會說 M2 比較大。"
+  },
+  {
+    "id": 57,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依 114 年地特三等貨幣銀行學考題，在 MV=PY 且 V 固定下，若央行追求零通膨而實質產出成長率為 g，則貨幣供給成長率應接近：",
+    "option_a": "0",
+    "option_b": "g",
+    "option_c": "-g",
+    "option_d": "2g",
+    "correct_answer": "B",
+    "hint": "把方程式改成成長率形式。",
+    "explanation": "① 正確答案：B。若 V 固定，則貨幣成長率約等於通膨率加實質產出成長率；零通膨下即約為 g。",
+    "topic_tags": [
+      "數量方程式",
+      "貨幣成長"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先寫 m+v=π+y。",
+    "essay_link": "這題很適合用一句話證明你不是死背。",
+    "trap_point": "把零通膨誤解成零貨幣成長。"
+  },
+  {
+    "id": 58,
+    "year": 114,
+    "exam_type": "高考三級",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 114 年高考三級貨幣銀行學考題，Taylor rule 的基本精神是：",
+    "option_a": "利率完全固定不變",
+    "option_b": "政策利率應對通膨偏離目標與產出缺口做系統性反應",
+    "option_c": "央行只看匯率",
+    "option_d": "央行只看失業率",
+    "correct_answer": "B",
+    "hint": "抓兩個核心輸入：通膨與產出缺口。",
+    "explanation": "① 正確答案：B。Taylor rule 提供一個系統性設定政策利率的規則，使利率會對通膨與產出偏離作出反應。",
+    "topic_tags": [
+      "Taylor rule",
+      "政策利率"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把規則的精神講對，再談計算。",
+    "essay_link": "申論不要漏掉『對通膨偏離目標』與『對產出缺口』兩部分。",
+    "trap_point": "把 Taylor rule 寫成單純固定利率。"
+  },
+  {
+    "id": 59,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 112 年高考三級經濟學考題，若兩群廠商勾結並共同訂價以極大化總利潤，與完全競爭相比，較可能出現：",
+    "option_a": "價格較低、產量較高",
+    "option_b": "價格較高、產量較低",
+    "option_c": "價格與產量皆不變",
+    "option_d": "邊際收益大於價格不再成立",
+    "correct_answer": "B",
+    "hint": "獨占/卡特爾直覺。",
+    "explanation": "① 正確答案：B。勾結後廠商會內部化競爭，結果更接近獨占：價格提高、產量下降。",
+    "topic_tags": [
+      "勾結",
+      "市場結構"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清完全競爭與勾結的邊際條件。",
+    "essay_link": "申論可寫：聯合利潤最大化下 MR=MC。",
+    "trap_point": "把個別廠商 MC 當成整體市場供給。"
+  },
+  {
+    "id": 60,
+    "year": 112,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 112 年高考三級經濟學考題，由國民所得會計恆等式可知，一國超額儲蓄（ES）與經常帳餘額（CA）的關係最接近：",
+    "option_a": "兩者無關",
+    "option_b": "超額儲蓄增加通常對應經常帳餘額增加",
+    "option_c": "超額儲蓄增加一定造成進口暴增",
+    "option_d": "經常帳增加一定代表政府赤字增加",
+    "correct_answer": "B",
+    "hint": "先抓『國內儲蓄相對投資』。",
+    "explanation": "① 正確答案：B。由開放經濟國民所得恆等式可知，當國內儲蓄相對投資增加時，通常反映為經常帳餘額提高。",
+    "topic_tags": [
+      "經常帳",
+      "超額儲蓄"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先寫出 S-I 與 CA 的連結。",
+    "essay_link": "這題申論很吃恆等式推導。",
+    "trap_point": "只談出口多，不談儲蓄投資差額。"
+  },
+  {
+    "id": 61,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "依 113 年高考三級經濟學考題，若需求愈缺乏彈性，獨占廠商的最適加價（markup）通常：",
+    "option_a": "愈小",
+    "option_b": "愈大",
+    "option_c": "不受影響",
+    "option_d": "必為零",
+    "correct_answer": "B",
+    "hint": "Lerner index 直覺。",
+    "explanation": "① 正確答案：B。需求愈缺乏彈性，廠商提高價格後失去的銷量較少，因此最適加價通常較大。",
+    "topic_tags": [
+      "markup",
+      "需求彈性"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把『彈性小 → 定價能力強』連起來。",
+    "essay_link": "申論可配圖或寫 Lerner 指數。",
+    "trap_point": "只會背『壟斷價高』卻說不出和彈性的關係。"
+  },
+  {
+    "id": 62,
+    "year": 113,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 113 年高考三級經濟學考題，若碳中和使企業成本上升，於 AD-AS 架構下短期較可能發生：",
+    "option_a": "SRAS 左移，物價上升、產出下降",
+    "option_b": "AD 右移，物價下降、產出上升",
+    "option_c": "LRAS 右移，物價下降",
+    "option_d": "只有 AD 左移",
+    "correct_answer": "A",
+    "hint": "這是成本推動型通膨。",
+    "explanation": "① 正確答案：A。生產成本上升會使短期總供給左移，造成綠色通膨：物價上升而產出下降。",
+    "topic_tags": [
+      "AD-AS",
+      "綠色通膨"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷衝擊來自需求還是供給。",
+    "essay_link": "申論可再補：央行面臨抑通膨與穩產出的兩難。",
+    "trap_point": "把成本上升直接寫成 AD 變動。"
+  },
+  {
+    "id": 63,
+    "year": 114,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 114 年高考三級經濟學考題，兩家廠商進行 Cournot 數量競爭時，各自求解均衡的核心是：",
+    "option_a": "同時選擇價格使需求最大",
+    "option_b": "對對方產量視為既定，求自己的最適反應函數",
+    "option_c": "先決定廣告量",
+    "option_d": "兩家必須簽合約",
+    "correct_answer": "B",
+    "hint": "Cournot 的關鍵是反應函數。",
+    "explanation": "① 正確答案：B。Cournot 模型下，每家廠商把對手產量視為既定，選擇自己的利潤最大產量，兩條反應函數交點即均衡。",
+    "topic_tags": [
+      "Cournot",
+      "反應函數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先寫各自利潤函數，再求 best response。",
+    "essay_link": "申論最穩：先推兩條反應函數，再聯立。",
+    "trap_point": "把 Cournot 和 Bertrand 搞混。"
+  },
+  {
+    "id": 64,
+    "year": 114,
+    "exam_type": "高考三級",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 114 年高考三級經濟學考題，在小型開放經濟、浮動匯率下，若國內投資轉為赴美投資而使淨資本流出增加，則在外匯市場上本國貨幣通常會：",
+    "option_a": "升值",
+    "option_b": "貶值",
+    "option_c": "完全不變",
+    "option_d": "先升後貶且無法解釋",
+    "correct_answer": "B",
+    "hint": "NCO 增加代表供給更多本國幣去換外幣。",
+    "explanation": "① 正確答案：B。淨資本流出增加時，外匯市場上本國貨幣供給增加，通常使本國貨幣貶值。",
+    "topic_tags": [
+      "小型開放經濟",
+      "淨資本流出"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把可貸資金市場和外匯市場連起來。",
+    "essay_link": "申論畫圖時別忘了把 NCO 放在外匯市場當供給。",
+    "trap_point": "只背『資本外流不好』，不會接到匯率。"
+  },
+  {
+    "id": 65,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "依 114 年地特三等經濟學考題，若自由貿易後一國的消費點落在其生產可能線之外，最合理的解釋是：",
+    "option_a": "貿易讓該國能藉交換達到超出自給自足的消費組合",
+    "option_b": "該國違反資源限制",
+    "option_c": "PPF 畫錯",
+    "option_d": "代表該國一定有失業",
+    "correct_answer": "A",
+    "hint": "貿易的福利來源。",
+    "explanation": "① 正確答案：A。國際貿易使一國可專業化生產並透過交換取得更多組合，因此消費可能位於本國 PPF 之外。",
+    "topic_tags": [
+      "國際貿易",
+      "PPF"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "申論圖形題常先分『生產點』和『消費點』。",
+    "essay_link": "可補：這是比較利益帶來的貿易得利。",
+    "trap_point": "把 PPF 當作消費上限而非生產上限。"
+  },
+  {
+    "id": 66,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "依 114 年地特三等經濟學考題，若政府對進口原物料課徵更高關稅，同時把增加的稅收補貼家戶消費，於 AD-AS 短期分析下較可能是：",
+    "option_a": "SRAS 左移，AD 右移",
+    "option_b": "SRAS 右移，AD 左移",
+    "option_c": "兩者都左移",
+    "option_d": "兩者都不動",
+    "correct_answer": "A",
+    "hint": "一個影響成本，一個影響需求。",
+    "explanation": "① 正確答案：A。原物料關稅提高使成本上升、SRAS 左移；把稅收補貼家戶消費則推升需求、AD 右移。",
+    "topic_tags": [
+      "AD-AS",
+      "關稅",
+      "補貼"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先把政策拆成兩段，各自對應一條曲線。",
+    "essay_link": "申論高分關鍵是能同時處理雙重衝擊。",
+    "trap_point": "只看到關稅就只畫供給。"
+  },
+  {
+    "id": 67,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依 114 年高考公共經濟學題意，最適庇古稅率應設為何者？",
+    "option_a": "等於污染造成的邊際外部成本",
+    "option_b": "等於平均外部成本",
+    "option_c": "等於固定污染處理費",
+    "option_d": "等於廠商全部利潤",
+    "correct_answer": "A",
+    "hint": "庇古稅不是隨便罰，而是要把外部成本內部化。",
+    "explanation": "① 正確答案：A。最適庇古稅率應等於最適產量下的邊際外部成本。② B 不是效率定價原則；C、D 都不是庇古稅的理論基礎。",
+    "topic_tags": [
+      "庇古稅",
+      "外部性"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 68,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "Lindahl 均衡之所以能滿足 Samuelson 條件，核心原因是：",
+    "option_a": "各人願付價格加總等於公共財邊際成本",
+    "option_b": "每個人支付相同稅額",
+    "option_c": "政府強制規定公共財數量",
+    "option_d": "多數決一定選出有效率方案",
+    "correct_answer": "A",
+    "hint": "把「個別願付價格加總」和公共財供給條件連起來。",
+    "explanation": "① 正確答案：A。Lindahl 均衡讓個別稅價加總等於公共財邊際成本，因此可對應 Samuelson 最適條件。② B 不是必要條件；C、D 也都錯。",
+    "topic_tags": [
+      "Lindahl均衡",
+      "Samuelson條件"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 69,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "Arrow 不可能定理中的 IIA，最適合解讀為：",
+    "option_a": "兩方案的社會排序不應受無關第三方案影響",
+    "option_b": "每位投票者都必須有相同所得",
+    "option_c": "所有人對所有方案必須排序一致",
+    "option_d": "集體決策一定能選出唯一最適方案",
+    "correct_answer": "A",
+    "hint": "IIA 在考「無關選項」會不會干擾原本兩方案排序。",
+    "explanation": "① 正確答案：A。IIA 要求兩方案間的社會排序只取決於個人對這兩方案的偏好。② 其餘選項都不是 IIA 的內容。",
+    "topic_tags": [
+      "Arrow不可能定理",
+      "IIA"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 70,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "依近年公共經濟學常見命題，Wagner 法則主要描述：",
+    "option_a": "隨經濟發展，政府支出占比有上升趨勢",
+    "option_b": "稅率越高稅收一定越多",
+    "option_c": "公共財一定由政府生產",
+    "option_d": "投票者一定支持擴張政府",
+    "correct_answer": "A",
+    "hint": "想想 Wagner 法則是在談長期支出趨勢。",
+    "explanation": "① 正確答案：A。Wagner 法則主張經濟發展過程中公共支出占國民所得比重有擴大趨勢。② 其餘選項都不是該法則內容。",
+    "topic_tags": [
+      "Wagner法則",
+      "公共支出"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 71,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "Baumol 成本病常用來說明：",
+    "option_a": "勞力密集公共服務部門成本相對上升",
+    "option_b": "污染稅一定會失敗",
+    "option_c": "地方政府一定會超額支出",
+    "option_d": "公共財一定不足供給",
+    "correct_answer": "A",
+    "hint": "抓住「生產力成長慢，但工資跟著整體經濟走」。",
+    "explanation": "① 正確答案：A。Baumol 成本病指出生產力較難提升的服務部門，成本會相對上升。② 其他選項都過度延伸。",
+    "topic_tags": [
+      "Baumol成本病",
+      "公共支出"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 72,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "Niskanen 官僚模型最可能預測官僚體系會：",
+    "option_a": "追求較大的預算規模",
+    "option_b": "自動選擇最小成本方案",
+    "option_c": "完全服從中位數投票者",
+    "option_d": "自然達到帕累托效率",
+    "correct_answer": "A",
+    "hint": "官僚模型的關鍵字就是「預算極大化」。",
+    "explanation": "① 正確答案：A。Niskanen 認為官僚可能追求預算與機關規模最大化。② B、C、D 都不是該模型核心結論。",
+    "topic_tags": [
+      "Niskanen",
+      "公共選擇"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 73,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等公共經濟學題意，下列何者最符合 Corlett-Hague 法則的精神？",
+    "option_a": "對休閒的互補品課較高商品稅以減少扭曲",
+    "option_b": "所有商品統一課相同稅率即可最有效率",
+    "option_c": "只對必需品課稅才能公平",
+    "option_d": "只要課所得稅就不需商品稅",
+    "correct_answer": "A",
+    "hint": "它在談「商品與休閒的互補程度」如何影響最適課稅。",
+    "explanation": "① 正確答案：A。Corlett-Hague 法則指出，對與休閒較互補的商品課較高稅可減少勞動供給扭曲。② B、C、D 都不是其核心。",
+    "topic_tags": [
+      "Corlett-Hague法則",
+      "租稅效率"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 74,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "所謂 built-in stabilizer，最適合的例子是：",
+    "option_a": "累進所得稅與失業給付會隨景氣自動變動",
+    "option_b": "政府臨時增加公共建設預算",
+    "option_c": "中央銀行召開會議後降息",
+    "option_d": "法院判決企業賠償污染損害",
+    "correct_answer": "A",
+    "hint": "自動穩定因子不用每次都等政府重新決策。",
+    "explanation": "① 正確答案：A。累進稅與失業給付會隨景氣循環自動發揮穩定效果。② B、C 屬裁量政策；D 與總體穩定無直接關聯。",
+    "topic_tags": [
+      "內在穩定因子",
+      "財政政策"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 75,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "租稅輸出（tax export）最可能發生在：",
+    "option_a": "地方政府將部分租稅負擔轉嫁給非本地居民",
+    "option_b": "政府把稅收轉成補助款發回人民",
+    "option_c": "企業出口時附帶出口稅",
+    "option_d": "中央政府替地方代徵稅款",
+    "correct_answer": "A",
+    "hint": "關鍵字是「把稅負丟給外地人」。",
+    "explanation": "① 正確答案：A。tax export 指地方稅負部分由外地居民、觀光客或外部資本承擔。② 其餘選項都不是標準定義。",
+    "topic_tags": [
+      "租稅輸出",
+      "地方財政"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 76,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "若要把 114 年高考公共經濟學第二題寫成高分申論，最好的第一步是：",
+    "option_a": "先說明公共財下 Lindahl 均衡的成本分攤機制，再連到 Samuelson 條件",
+    "option_b": "直接背出公共財定義，不談均衡",
+    "option_c": "只寫市場失靈，不寫協商過程",
+    "option_d": "只說公共財不可排他即可",
+    "correct_answer": "A",
+    "hint": "高分答案要先搭橋：個別稅價 → 協商 → 最適條件。",
+    "explanation": "① 正確答案：A。這種題目高分關鍵是先清楚交代 Lindahl 協商邏輯，再連到 Samuelson 條件。② 其餘寫法都太薄。",
+    "topic_tags": [
+      "申論架構",
+      "Lindahl均衡"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 77,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "關於公共財 Samuelson 條件，下列何者正確？",
+    "option_a": "個別邊際願付加總等於邊際成本",
+    "option_b": "個別邊際願付必須彼此相等",
+    "option_c": "公共財價格應等於零",
+    "option_d": "只要多數人同意就有效率",
+    "correct_answer": "A",
+    "hint": "Samuelson 條件考的是「垂直加總」。",
+    "explanation": "① 正確答案：A。公共財效率條件是所有個人的邊際願付加總等於邊際成本。② B、C、D 均誤。",
+    "topic_tags": [
+      "Samuelson條件",
+      "公共財"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 78,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "中位數投票者定理最可能成立於：",
+    "option_a": "單峰偏好且一維政策空間",
+    "option_b": "多維政策空間且偏好多峰",
+    "option_c": "所有人都無偏好差異",
+    "option_d": "政府不需投票即可決策",
+    "correct_answer": "A",
+    "hint": "中位數投票者不是萬用，要有前提。",
+    "explanation": "① 正確答案：A。中位數投票者定理需單峰偏好與單一政策維度等條件。② 其餘都不符合。",
+    "topic_tags": [
+      "中位數投票者",
+      "公共選擇"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 79,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "影子價格（shadow price）最適合解讀為：",
+    "option_a": "在限制式多增加一單位時目標值增加的邊際價值",
+    "option_b": "市場上的實際成交價格",
+    "option_c": "政府公告價格",
+    "option_d": "平均成本的另一種說法",
+    "correct_answer": "A",
+    "hint": "它在最適化問題裡出現，不一定等於市價。",
+    "explanation": "① 正確答案：A。shadow price 是約束條件放寬一單位對目標函數的邊際貢獻。② 其餘均非標準定義。",
+    "topic_tags": [
+      "影子價格",
+      "最適化"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 80,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "尖峰負荷訂價（peak-load pricing）主要是為了反映：",
+    "option_a": "不同時段容量稀缺程度不同",
+    "option_b": "所有使用者所得不同",
+    "option_c": "政府部門的平均成本固定",
+    "option_d": "外部性一定不存在",
+    "correct_answer": "A",
+    "hint": "容量有限的時候，尖峰與離峰邊際成本不同。",
+    "explanation": "① 正確答案：A。peak-load pricing 反映不同時段邊際容量成本與需求壓力差異。② 其餘說法均不正確。",
+    "topic_tags": [
+      "尖峰負荷訂價",
+      "公共定價"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 81,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "若某項稅制設計希望在相同稅收下減少效率損失，最不應忽略的是：",
+    "option_a": "需求與供給彈性",
+    "option_b": "納稅人的身高",
+    "option_c": "企業名稱長度",
+    "option_d": "地區行政層級",
+    "correct_answer": "A",
+    "hint": "稅制效率幾乎都和彈性脫不了關係。",
+    "explanation": "① 正確答案：A。超額負擔大小與彈性高度相關。② 其餘與效率損失無直接理論關聯。",
+    "topic_tags": [
+      "租稅效率",
+      "彈性"
+    ],
+    "question_type": "陷阱辨識",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 82,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "若一道申論題同時問「外部性定義」與「政府作為」，最好的作答順序是：",
+    "option_a": "先區分技術性與金融性外部性，再說是否需政府介入",
+    "option_b": "直接寫政府應全面課稅",
+    "option_c": "先寫政治哲學，再舉生活例子",
+    "option_d": "只要定義，不必討論政策",
+    "correct_answer": "A",
+    "hint": "題目問兩件事時，先釐清類型再進政策。",
+    "explanation": "① 正確答案：A。這樣才能把「是否需要介入」建立在外部性性質上。② 其餘順序都容易失焦。",
+    "topic_tags": [
+      "外部性",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 83,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "Arrow 不可能定理的意涵之一是：",
+    "option_a": "想同時滿足一組看似合理的集體決策條件可能做不到",
+    "option_b": "任何投票制度都比市場有效率",
+    "option_c": "只要兩人社會就一定能完美聚合偏好",
+    "option_d": "多數決永遠保證遞移性",
+    "correct_answer": "A",
+    "hint": "它不是說投票無用，而是說完美規則難以存在。",
+    "explanation": "① 正確答案：A。Arrow 指出在若干合理條件下，不存在能完美聚合個人偏好的社會福利函數。② 其餘為誤解。",
+    "topic_tags": [
+      "Arrow不可能定理",
+      "社會選擇"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 84,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "若政府支出成長主要來自照護、教育等勞力密集服務，相對合理的解釋是：",
+    "option_a": "Baumol 成本病",
+    "option_b": "Laffer 曲線",
+    "option_c": "Ricardian equivalence",
+    "option_d": "Phillips 曲線",
+    "correct_answer": "A",
+    "hint": "服務部門生產力成長較慢時，成本相對容易墊高。",
+    "explanation": "① 正確答案：A。Baumol 成本病很常用來解釋教育、醫療、表演藝術等部門成本上升。② 其餘皆不相符。",
+    "topic_tags": [
+      "Baumol成本病",
+      "公共支出"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先分清這題是在考效率、公平、公共選擇，還是地方財政。",
+    "essay_link": "申論常見高分寫法是：定義 → 條件 → 圖形或原理 → 政策含意。",
+    "trap_point": "最常見失分是只背名詞，卻沒寫出成立前提。"
+  },
+  {
+    "id": 85,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依 110 年地特三等貨幣銀行學題意，在 IS-LM 架構下，擴張性財政政策最直接造成：",
+    "option_a": "IS 曲線右移",
+    "option_b": "LM 曲線右移",
+    "option_c": "AD 曲線左移",
+    "option_d": "AS 曲線右移",
+    "correct_answer": "A",
+    "hint": "先不要急著想最終結果，先找哪條曲線先動。",
+    "explanation": "① 正確答案：A。政府支出增加會先使商品市場均衡對應的 IS 線右移。② LM 是貨幣市場；AD-AS 是下一層分析。",
+    "topic_tags": [
+      "IS-LM",
+      "財政政策"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 86,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "在同一題脈絡下，若民眾預期通膨上升，較可能先造成：",
+    "option_a": "LM 左移或貨幣需求下降造成利率上升壓力",
+    "option_b": "IS 左移且利率下降",
+    "option_c": "AS 右移且物價下降",
+    "option_d": "債券價格上升且殖利率下降",
+    "correct_answer": "A",
+    "hint": "把「預期通膨上升」想成持有貨幣的機會成本提高。",
+    "explanation": "① 正確答案：A。預期通膨上升會降低實質貨幣需求，對利率帶來上升壓力，可表現在 LM 左移／貨幣市場重新均衡。② 其餘方向不對。",
+    "topic_tags": [
+      "IS-LM",
+      "預期通膨"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 87,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "六年期零息債券的 duration 會：",
+    "option_a": "等於 6 年",
+    "option_b": "小於 6 年",
+    "option_c": "大於 6 年",
+    "option_d": "一定等於票面利率",
+    "correct_answer": "A",
+    "hint": "零息債券所有現金流都在到期日。",
+    "explanation": "① 正確答案：A。零息債券的 Macaulay duration 等於到期年數。② 其餘皆錯。",
+    "topic_tags": [
+      "duration",
+      "債券"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 88,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "若銀行資產 duration 大於負債 duration，且利率下降，則銀行淨值通常會：",
+    "option_a": "上升",
+    "option_b": "下降",
+    "option_c": "不變",
+    "option_d": "必然歸零",
+    "correct_answer": "A",
+    "hint": "資產價格對利率比較敏感時，降息會讓資產漲更多。",
+    "explanation": "① 正確答案：A。資產 duration 較長時，利率下降造成資產價值增幅大於負債，因此淨值增加。② 其餘不符 duration gap 邏輯。",
+    "topic_tags": [
+      "duration gap",
+      "銀行淨值"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 89,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "次順位債券在銀行清償順位上通常：",
+    "option_a": "晚於一般存款與優先債權",
+    "option_b": "優先於存款",
+    "option_c": "與股東權益同順位",
+    "option_d": "高於政府稅捐債權",
+    "correct_answer": "A",
+    "hint": "「次順位」本身就在提示順位較後。",
+    "explanation": "① 正確答案：A。次順位債在清償順序上晚於一般債權與存款。② 但通常仍優先於股東權益。",
+    "topic_tags": [
+      "次順位債",
+      "銀行資本"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 90,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "Basel III 相對 Basel II 的重要特色之一是：",
+    "option_a": "更強調普通股資本品質與流動性監理",
+    "option_b": "取消資本適足率要求",
+    "option_c": "不再管理槓桿風險",
+    "option_d": "完全放棄總體審慎監理",
+    "correct_answer": "A",
+    "hint": "金融海嘯後，Basel III 補強的就是資本品質和流動性。",
+    "explanation": "① 正確答案：A。Basel III 強調 CET1、LCR、NSFR 與槓桿比率等。② 其餘都與事實相反。",
+    "topic_tags": [
+      "Basel III",
+      "金融監理"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 91,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "Friedman 的貨幣需求理論較接近把貨幣視為：",
+    "option_a": "一種資產組合選擇中的耐久資產",
+    "option_b": "僅是交易媒介且與財富無關",
+    "option_c": "只由當期所得決定",
+    "option_d": "完全不受報酬率影響",
+    "correct_answer": "A",
+    "hint": "Friedman 不是只看當期交易，而是放到資產選擇裡。",
+    "explanation": "① 正確答案：A。Friedman 將貨幣需求視為財富配置選擇的一部分，受永久所得與各種報酬率影響。② 其餘皆過度簡化。",
+    "topic_tags": [
+      "Friedman貨幣需求",
+      "貨幣需求"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 92,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "可貸資金理論中，政府財政赤字擴大在其他條件不變下通常會：",
+    "option_a": "提高可貸資金需求並推升利率",
+    "option_b": "增加可貸資金供給並壓低利率",
+    "option_c": "不影響利率",
+    "option_d": "直接使物價下降",
+    "correct_answer": "A",
+    "hint": "先想政府借更多錢，代表誰的需求變多。",
+    "explanation": "① 正確答案：A。赤字擴大意味政府借款需求增加，可貸資金需求右移，利率上升。② 其餘不符模型。",
+    "topic_tags": [
+      "可貸資金理論",
+      "利率"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 93,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "Taylor rule 中，政策利率通常會對下列何者作出反應？",
+    "option_a": "通膨缺口與產出缺口",
+    "option_b": "僅對失業率反應",
+    "option_c": "僅對匯率反應",
+    "option_d": "只要貨幣基數變動就固定調整",
+    "correct_answer": "A",
+    "hint": "Taylor rule 抓的是「偏離目標多少」。",
+    "explanation": "① 正確答案：A。Taylor rule 會依通膨與產出偏離目標的程度調整政策利率。② 其餘都過度簡化。",
+    "topic_tags": [
+      "Taylor rule",
+      "貨幣政策"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 94,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "零利率下限（ZLB）最可能意味著：",
+    "option_a": "傳統降息空間受限，需仰賴非常規政策",
+    "option_b": "中央銀行完全無法影響市場",
+    "option_c": "物價一定立刻上漲",
+    "option_d": "政府不能發債",
+    "correct_answer": "A",
+    "hint": "ZLB 不是世界末日，是傳統工具受限。",
+    "explanation": "① 正確答案：A。ZLB 下傳統利率工具受限，中央銀行可能改用量化寬鬆、前瞻指引等。② 其餘都錯。",
+    "topic_tags": [
+      "零利率下限",
+      "非常規政策"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 95,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "下列何者屬於貨幣基數的一部分？",
+    "option_a": "銀行在央行存款",
+    "option_b": "公眾信用卡可用額度",
+    "option_c": "政府未來稅收",
+    "option_d": "股票市值",
+    "correct_answer": "A",
+    "hint": "貨幣基數看的是央行直接創造或控制的高能貨幣。",
+    "explanation": "① 正確答案：A。銀行準備金與通貨發行額構成貨幣基數核心。② 其餘不屬於貨幣基數。",
+    "topic_tags": [
+      "貨幣基數",
+      "銀行準備"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 96,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "若貨幣基數不變但貨幣供給明顯下降，較合理的解釋是：",
+    "option_a": "銀行超額準備上升或公眾持有現金比率上升",
+    "option_b": "中央銀行印鈔速度加快",
+    "option_c": "法定準備率降到零以下",
+    "option_d": "所有利率都固定不變",
+    "correct_answer": "A",
+    "hint": "先想貨幣乘數為何會縮小。",
+    "explanation": "① 正確答案：A。貨幣供給 = 貨幣基數 × 貨幣乘數，若公眾持幣偏好或銀行保守放款提高，乘數會下降。",
+    "topic_tags": [
+      "貨幣乘數",
+      "貨幣供給"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 97,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "名目貨幣需求與實質貨幣需求的關係可表示為：",
+    "option_a": "名目貨幣需求 = 物價水準 × 實質貨幣需求",
+    "option_b": "名目貨幣需求 = 實質貨幣需求 ÷ 物價水準",
+    "option_c": "兩者永遠相同",
+    "option_d": "兩者無法換算",
+    "correct_answer": "A",
+    "hint": "想想把購買力換成貨幣面額時，要不要乘上物價。",
+    "explanation": "① 正確答案：A。M^d = P × L(Y,i) 是基本表示方式。② 其餘錯。",
+    "topic_tags": [
+      "貨幣需求",
+      "名目與實質"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 98,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "預期通膨率上升，在其他條件不變下通常會：",
+    "option_a": "降低實質貨幣需求並推升利率",
+    "option_b": "提高實質貨幣需求並壓低利率",
+    "option_c": "不影響任何金融變數",
+    "option_d": "使貨幣基數自動下降",
+    "correct_answer": "A",
+    "hint": "持有貨幣的機會成本提高時，人們通常想少拿現金。",
+    "explanation": "① 正確答案：A。預期通膨率高使持幣吸引力下降，貨幣需求減少，利率上升。",
+    "topic_tags": [
+      "預期通膨",
+      "貨幣需求"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 99,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "若一道申論題同時問 Taylor rule 與 ZLB，最好的作答方式是：",
+    "option_a": "先說正常情況下 Taylor rule 如何調整利率，再說 ZLB 下傳統規則受限",
+    "option_b": "直接背出所有央行工具，不分情境",
+    "option_c": "只寫 ZLB，不寫 Taylor rule",
+    "option_d": "只寫公式，不解釋經濟直覺",
+    "correct_answer": "A",
+    "hint": "題目給兩個概念，常常是在考「正常情況」與「失靈情境」的對照。",
+    "explanation": "① 正確答案：A。這樣才能交代規則的常態運作與在 ZLB 下的限制。② 其餘作法都容易失焦。",
+    "topic_tags": [
+      "Taylor rule",
+      "ZLB",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 100,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依可貸資金理論，私人儲蓄增加通常會使：",
+    "option_a": "可貸資金供給增加，利率下降",
+    "option_b": "可貸資金需求增加，利率上升",
+    "option_c": "利率不變，只改變物價",
+    "option_d": "中央銀行資產負債表自動擴張",
+    "correct_answer": "A",
+    "hint": "儲蓄是供給面，不是需求面。",
+    "explanation": "① 正確答案：A。私人儲蓄增加使可貸資金供給右移，利率下降。",
+    "topic_tags": [
+      "可貸資金理論",
+      "儲蓄"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 101,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "把 110 年貨銀第一題寫成申論時，最容易犯的錯誤是：",
+    "option_a": "直接寫最終利率與所得結果，卻沒交代 IS、LM、AD、AS 各自怎麼動",
+    "option_b": "先分兩個模型作答",
+    "option_c": "說明預期通膨會影響貨幣需求",
+    "option_d": "分短期與更一般均衡討論",
+    "correct_answer": "A",
+    "hint": "考官真正要看的是「推理鏈」，不只是結論。",
+    "explanation": "① 正確答案：A。這類題目最怕跳步，會讓答案像在背誦而不是分析。",
+    "topic_tags": [
+      "IS-LM",
+      "AD-AS",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 102,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "M1A 與準貨幣的區分，最關鍵在於：",
+    "option_a": "流動性與支付性高低不同",
+    "option_b": "是否能放進錢包",
+    "option_c": "是否由政府發行",
+    "option_d": "是否能買股票",
+    "correct_answer": "A",
+    "hint": "貨幣供給分類核心是流動性。",
+    "explanation": "① 正確答案：A。M1A、M1B、M2 的差別重點在支付與流動性。",
+    "topic_tags": [
+      "M1A",
+      "準貨幣"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 103,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "若中央銀行採外匯市場操作支持本幣匯率，最直接的動作可能是：",
+    "option_a": "賣出外匯、買回本國貨幣",
+    "option_b": "買進外匯、釋出本國貨幣",
+    "option_c": "提高政府支出",
+    "option_d": "直接凍結銀行存款",
+    "correct_answer": "A",
+    "hint": "想像央行在市場上要讓本幣變稀少還是變更多。",
+    "explanation": "① 正確答案：A。支持本幣通常意味賣外匯買回本國貨幣，減少本幣供給。② 其餘不對。",
+    "topic_tags": [
+      "外匯政策",
+      "央行操作"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷是資產負債表、貨幣供給、利率決定，還是政策傳導。",
+    "essay_link": "申論高分關鍵是：先界定變數，再說方向，再補一句為何。",
+    "trap_point": "最常見錯誤是只背結論，沒有交代中間傳導鏈。"
+  },
+  {
+    "id": 104,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "依 110 年地特三等統計學第一題資料，若高溫天數資料出現極端高值，分配較可能：",
+    "option_a": "右偏",
+    "option_b": "左偏",
+    "option_c": "完全對稱",
+    "option_d": "一定常態",
+    "correct_answer": "A",
+    "hint": "極端大值通常把尾巴往哪邊拉？",
+    "explanation": "① 正確答案：A。極端高值會把分配右尾拉長，因此較可能右偏。② 其餘不合理。",
+    "topic_tags": [
+      "偏態",
+      "描述統計"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 105,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "檢定平均來客數是否大於 200 且母體變異數未知、樣本數小時，較適合使用：",
+    "option_a": "單一樣本 t 檢定",
+    "option_b": "單一樣本 z 檢定",
+    "option_c": "卡方獨立性檢定",
+    "option_d": "成對樣本比例檢定",
+    "correct_answer": "A",
+    "hint": "小樣本 + 常態 + σ 未知，先想到 t。",
+    "explanation": "① 正確答案：A。平均數檢定在母體常態、σ 未知且樣本數小時，應使用單一樣本 t 檢定。",
+    "topic_tags": [
+      "t檢定",
+      "假設檢定"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 106,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "Poisson process 中，若 A 線每 2 小時一件不良品、B 線每 3 小時一件，第一件不良品來自 A 線的機率為：",
+    "option_a": "λA/(λA+λB)",
+    "option_b": "λB/(λA+λB)",
+    "option_c": "1/2",
+    "option_d": "與速率無關",
+    "correct_answer": "A",
+    "hint": "兩個獨立 Poisson 過程誰先到，看的是速率占比。",
+    "explanation": "① 正確答案：A。第一個事件來自某過程的機率等於其速率占總速率的比例。",
+    "topic_tags": [
+      "Poisson process",
+      "指數分配"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 107,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "檢定吸菸量與心血管疾病有無關聯，最適合的工具是：",
+    "option_a": "卡方獨立性檢定",
+    "option_b": "單一比例 z 檢定",
+    "option_c": "配對 t 檢定",
+    "option_d": "F 檢定",
+    "correct_answer": "A",
+    "hint": "兩個類別變數之間有沒有關聯？",
+    "explanation": "① 正確答案：A。吸菸分組與疾病有無都是類別變數，適合做列聯表卡方獨立性檢定。",
+    "topic_tags": [
+      "卡方檢定",
+      "列聯表"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 108,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "五工廠三製程的例子中，若各工廠都用到三種製程，這樣的設計最接近：",
+    "option_a": "隨機完全區集設計（RCBD）",
+    "option_b": "完全隨機設計",
+    "option_c": "二因子重複量數設計",
+    "option_d": "分層抽樣",
+    "correct_answer": "A",
+    "hint": "工廠在這裡像「區集」，製程像處理。",
+    "explanation": "① 正確答案：A。每個工廠都接受三種製程，可控制工廠差異，屬 RCBD 思路。",
+    "topic_tags": [
+      "RCBD",
+      "ANOVA"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 109,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "ANOVA 中若 F 值很大，通常代表：",
+    "option_a": "組間變異相對組內變異較大",
+    "option_b": "組內變異一定為零",
+    "option_c": "所有平均數完全相同",
+    "option_d": "樣本數一定不足",
+    "correct_answer": "A",
+    "hint": "F 值本質上是兩種變異的比率。",
+    "explanation": "① 正確答案：A。F 值大表示處理效果造成的組間變異相對明顯。② 不代表組內變異為零。",
+    "topic_tags": [
+      "ANOVA",
+      "F統計量"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 110,
+    "year": 110,
+    "exam_type": "地特三等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "簡單線性迴歸中，決定係數 R² 的意義最接近：",
+    "option_a": "解釋變數對反應變數變異的解釋比例",
+    "option_b": "斜率必為正的機率",
+    "option_c": "殘差一定服從常態的程度",
+    "option_d": "自變數的平均值",
+    "correct_answer": "A",
+    "hint": "R² 是「解釋多少」，不是「因果有多真」。",
+    "explanation": "① 正確答案：A。R² 衡量模型解釋總變異的比例。② 其餘並非 R² 定義。",
+    "topic_tags": [
+      "迴歸分析",
+      "R平方"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 111,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "若 Xi 服從 Exp(λ)，則樣本和 ΣXi 的分配為：",
+    "option_a": "Gamma 分配",
+    "option_b": "常態分配",
+    "option_c": "二項分配",
+    "option_d": "卡方分配且與 λ 無關",
+    "correct_answer": "A",
+    "hint": "指數分配加總常連到 Gamma。",
+    "explanation": "① 正確答案：A。獨立同分配指數變數之和服從 Gamma 分配。",
+    "topic_tags": [
+      "指數分配",
+      "Gamma分配"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 112,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "在簡單線性迴歸中，Cov(Ȳ, b1) 常被要求推導，這類題目首先要用到：",
+    "option_a": "最小平方法估計式的線性表示",
+    "option_b": "中央極限定理",
+    "option_c": "卡方分配表",
+    "option_d": "樣本中位數",
+    "correct_answer": "A",
+    "hint": "先把估計量寫成 Xi、Yi 的線性組合。",
+    "explanation": "① 正確答案：A。這類推導題的核心是把 b1 與 Ȳ 表成誤差項的線性組合，再用共變異數性質。",
+    "topic_tags": [
+      "迴歸推導",
+      "共變異數"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 113,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "投資組合報酬率的期望值，若權重為 0.7 與 0.3，則應：",
+    "option_a": "用加權平均計算",
+    "option_b": "把兩者標準差直接相加",
+    "option_c": "只取較高報酬資產的平均數",
+    "option_d": "一定等於 0.5 的平均數",
+    "correct_answer": "A",
+    "hint": "期望值先看線性，變異數才會碰到平方與共變。",
+    "explanation": "① 正確答案：A。投資組合期望報酬率等於各資產期望報酬的加權平均。",
+    "topic_tags": [
+      "投資組合",
+      "期望值"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 114,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "投資組合變異數除了權重與個別變異數外，還必須考慮：",
+    "option_a": "資產間共變異數",
+    "option_b": "樣本中位數",
+    "option_c": "檢定力",
+    "option_d": "自由度",
+    "correct_answer": "A",
+    "hint": "這題最容易漏掉相關性。",
+    "explanation": "① 正確答案：A。組合風險關鍵在共變異數或相關係數。",
+    "topic_tags": [
+      "投資組合",
+      "變異數"
+    ],
+    "question_type": "陷阱辨識",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 115,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "建立 95% 信賴區間時，若樣本數增加且其他條件相同，區間通常會：",
+    "option_a": "變窄",
+    "option_b": "變寬",
+    "option_c": "完全不變",
+    "option_d": "一定偏右",
+    "correct_answer": "A",
+    "hint": "樣本多時，標準誤通常變小。",
+    "explanation": "① 正確答案：A。樣本數增加會降低標準誤，使信賴區間縮小。",
+    "topic_tags": [
+      "信賴區間",
+      "標準誤"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 116,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若檢定統計量落入拒絕域，正確結論應是：",
+    "option_a": "拒絕虛無假設",
+    "option_b": "接受虛無假設一定為真",
+    "option_c": "母數等於樣本統計量",
+    "option_d": "顯著水準必須改成 0.5",
+    "correct_answer": "A",
+    "hint": "統計檢定用的是「拒絕／不拒絕」，不是證明為真。",
+    "explanation": "① 正確答案：A。落入拒絕域代表在顯著水準下拒絕 H0。② 其餘是常見誤解。",
+    "topic_tags": [
+      "假設檢定",
+      "拒絕域"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 117,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "男生與女生願意購買高階手機比例比較，若要檢定 P1>P2，適合使用：",
+    "option_a": "兩母體比例差 z 檢定",
+    "option_b": "兩樣本平均數 t 檢定",
+    "option_c": "卡方適合度檢定",
+    "option_d": "單一比例檢定",
+    "correct_answer": "A",
+    "hint": "兩組比例差異，用比例檢定。",
+    "explanation": "① 正確答案：A。題目在比較兩母體比例差異且樣本夠大，適合 z 檢定。",
+    "topic_tags": [
+      "比例檢定",
+      "兩母體比較"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 118,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "多元迴歸中若要同時檢定兩個斜率是否都為 0，通常使用：",
+    "option_a": "F 檢定",
+    "option_b": "單一 t 檢定",
+    "option_c": "卡方檢定",
+    "option_d": "符號檢定",
+    "correct_answer": "A",
+    "hint": "同時檢定多個係數，先想到整體 F。",
+    "explanation": "① 正確答案：A。多重限制的聯合檢定通常使用 F 檢定。",
+    "topic_tags": [
+      "多元迴歸",
+      "F檢定"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 119,
+    "year": 110,
+    "exam_type": "四等",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求完整寫出虛無假設、對立假設、檢定統計量與結論，最好的答題順序是：",
+    "option_a": "H0/H1 → 統計量 → 拒絕準則 → 結論",
+    "option_b": "先寫結論，再補統計量",
+    "option_c": "只寫 p 值即可",
+    "option_d": "先計算平均數，不用交代假設",
+    "correct_answer": "A",
+    "hint": "這類題目很制式，順序亂很容易失分。",
+    "explanation": "① 正確答案：A。這是申論型統計題最穩定的作答骨架。",
+    "topic_tags": [
+      "假設檢定",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 120,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "若一道統計申論題同時問分配名稱與 mgf，較好的寫法是：",
+    "option_a": "先推導 mgf，再指出對應分配名稱與參數",
+    "option_b": "直接猜分配名稱即可",
+    "option_c": "只寫結果不寫過程",
+    "option_d": "先查表，再決定樣本數",
+    "correct_answer": "A",
+    "hint": "考官既然要 mgf，多半就是要看推導。",
+    "explanation": "① 正確答案：A。題目要求 mgf，代表過程很重要，最後再指出其對應分配最完整。",
+    "topic_tags": [
+      "動差母函數",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先判斷資料型態、母數、分配與樣本數，再選方法。",
+    "essay_link": "申論常見高分結構：假設 → 統計量 → 分配 → 拒絕域或結論。",
+    "trap_point": "最常見失分是看懂題意卻選錯檢定工具。"
+  },
+  {
+    "id": 121,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "若政府課稅不造成無謂損失，較可能表示該稅基的供需：",
+    "option_a": "完全無彈性",
+    "option_b": "高度有彈性",
+    "option_c": "需求與供給皆為單位彈性",
+    "option_d": "必然不存在市場",
+    "correct_answer": "A",
+    "hint": "無謂損失來自數量扭曲；若數量不動，損失可為零。",
+    "explanation": "① 正確答案：A。若供需完全無彈性，課稅不改變交易量，可無無謂損失。",
+    "topic_tags": [
+      "租稅",
+      "無謂損失"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 122,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "勞動參與率的分母應為：",
+    "option_a": "15 歲以上民間人口",
+    "option_b": "就業人口",
+    "option_c": "失業人口",
+    "option_d": "非勞動力人口",
+    "correct_answer": "A",
+    "hint": "先記住參與率是「勞動力 / 民間人口」。",
+    "explanation": "① 正確答案：A。勞動參與率 = 勞動力 / 15 歲以上民間人口。",
+    "topic_tags": [
+      "勞動市場",
+      "勞參率"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 123,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "失業率的分母應為：",
+    "option_a": "勞動力人口",
+    "option_b": "總人口",
+    "option_c": "就業人口",
+    "option_d": "非勞動力人口",
+    "correct_answer": "A",
+    "hint": "失業率不是拿失業人口除總人口。",
+    "explanation": "① 正確答案：A。失業率 = 失業人口 / 勞動力人口。",
+    "topic_tags": [
+      "勞動市場",
+      "失業率"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 124,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "在兩期消費模型中，實質利率上升帶來的替代效果，通常會使當期消費：",
+    "option_a": "下降",
+    "option_b": "上升",
+    "option_c": "不變",
+    "option_d": "一定先升後降",
+    "correct_answer": "A",
+    "hint": "利率上升代表現在消費的機會成本提高。",
+    "explanation": "① 正確答案：A。利率上升使當期消費相對昂貴，替代效果下 C0 下降。",
+    "topic_tags": [
+      "跨期選擇",
+      "替代效果"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 125,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "獨買勞動市場相較於競爭性勞動市場，通常會出現：",
+    "option_a": "僱用量較低、工資較低",
+    "option_b": "僱用量較高、工資較高",
+    "option_c": "僱用量較低、工資較高",
+    "option_d": "僱用量相同、工資較低",
+    "correct_answer": "A",
+    "hint": "monopsony 的關鍵是壓低工資、減少僱用。",
+    "explanation": "① 正確答案：A。獨買者面對向上勞動供給，通常壓低工資並減少雇用。",
+    "topic_tags": [
+      "獨買市場",
+      "勞動市場"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 126,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "公共財的非敵對性是指：",
+    "option_a": "一人多消費通常不減少他人可消費量",
+    "option_b": "沒有機會成本",
+    "option_c": "政府必須提供",
+    "option_d": "一定無排他性",
+    "correct_answer": "A",
+    "hint": "非敵對性只在講消費是否互相擠壓。",
+    "explanation": "① 正確答案：A。非敵對性表示邊際消費者增加時不明顯減少他人消費量。② 不等於沒有機會成本。",
+    "topic_tags": [
+      "公共財",
+      "非敵對性"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 127,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "若開放貿易後一國消費點落在生產可能線之外，代表：",
+    "option_a": "貿易使其可達成超出自給自足的消費組合",
+    "option_b": "PPC 外生擴張",
+    "option_c": "資源使用必然無效率",
+    "option_d": "國內技術一定提升",
+    "correct_answer": "A",
+    "hint": "貿易的好處之一就是消費可能性超過生產可能性。",
+    "explanation": "① 正確答案：A。透過國際交換，一國消費可超出自身生產可能線。",
+    "topic_tags": [
+      "國際貿易",
+      "PPC"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 128,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "需求具有彈性時，價格下降通常會使總收益：",
+    "option_a": "增加",
+    "option_b": "減少",
+    "option_c": "不變",
+    "option_d": "先增後減",
+    "correct_answer": "A",
+    "hint": "彈性需求的數量效果會大於價格效果。",
+    "explanation": "① 正確答案：A。當需求彈性大於 1，降價引發的數量增加足以讓總收益上升。",
+    "topic_tags": [
+      "需求彈性",
+      "總收益"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 129,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "成本函數 C(q)=20+3q 較適合解讀為：",
+    "option_a": "短期成本函數，固定成本為 20",
+    "option_b": "長期成本函數，固定成本為 0",
+    "option_c": "邊際成本遞增",
+    "option_d": "平均固定成本固定不變",
+    "correct_answer": "A",
+    "hint": "只要有固定成本項，就不像典型長期成本。",
+    "explanation": "① 正確答案：A。固定成本為 20，邊際成本為 3，屬含固定成本的短期形式。",
+    "topic_tags": [
+      "成本函數",
+      "短期成本"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 130,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "三家廠商 Cournot 競爭時，若市場需求與邊際成本已知，個別產量決定核心在於：",
+    "option_a": "同時考慮對手產量並求反應函數交點",
+    "option_b": "只看平均成本最低點",
+    "option_c": "由政府決定產量",
+    "option_d": "完全忽略固定成本與市場需求",
+    "correct_answer": "A",
+    "hint": "Cournot 核心不是背公式，而是反應函數。",
+    "explanation": "① 正確答案：A。Cournot 均衡是各廠商反應函數的交點。",
+    "topic_tags": [
+      "Cournot",
+      "寡占"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 131,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "在完全競爭市場短期均衡下，個別廠商的生產者剩餘：",
+    "option_a": "通常大於或等於零",
+    "option_b": "一定小於零",
+    "option_c": "一定等於利潤",
+    "option_d": "一定為零",
+    "correct_answer": "A",
+    "hint": "就算虧損，只要價格高於 AVC，生產者剩餘仍可能為正。",
+    "explanation": "① 正確答案：A。生產者剩餘是價格減可變成本部分，不必然等於利潤。",
+    "topic_tags": [
+      "完全競爭",
+      "生產者剩餘"
+    ],
+    "question_type": "陷阱辨識",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 132,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "若政府開放原本獨占的電視機市場給其他廠商生產，較可能發生：",
+    "option_a": "生產者剩餘下降、消費者剩餘上升",
+    "option_b": "消費者剩餘下降",
+    "option_c": "社會福利下降",
+    "option_d": "產量下降價格上升",
+    "correct_answer": "A",
+    "hint": "競爭增加通常壓低價格、擴大產量。",
+    "explanation": "① 正確答案：A。開放競爭通常使原獨占利潤下降，但消費者受益。",
+    "topic_tags": [
+      "市場結構",
+      "消費者剩餘"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 133,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "對污染活動課徵等於外部邊際成本的稅，其效果在於：",
+    "option_a": "迫使生產者內部化外部成本",
+    "option_b": "保證廠商利潤上升",
+    "option_c": "完全消除所有污染",
+    "option_d": "使市場回到壟斷均衡",
+    "correct_answer": "A",
+    "hint": "庇古稅核心是內部化，不是保證零污染。",
+    "explanation": "① 正確答案：A。最適污染稅讓私人邊際成本加上外部成本，回到有效率產量。",
+    "topic_tags": [
+      "庇古稅",
+      "外部性"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 134,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 1,
+    "question_text": "下列何者不是中央銀行常見貨幣政策工具？",
+    "option_a": "調整市場匯率本身",
+    "option_b": "公開市場操作",
+    "option_c": "重貼現率",
+    "option_d": "法定準備率",
+    "correct_answer": "A",
+    "hint": "匯率可以受政策影響，但不是標準列舉的直接工具。",
+    "explanation": "① 正確答案：A。標準貨幣政策工具包括公開市場操作、重貼現率、法定準備率。",
+    "topic_tags": [
+      "貨幣政策",
+      "央行工具"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 135,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "AK 內生成長模型中，長期成長較能來自：",
+    "option_a": "持續的資本累積與知識外溢",
+    "option_b": "人口自然成長本身",
+    "option_c": "資本邊際報酬必然遞減",
+    "option_d": "資源總量固定不變",
+    "correct_answer": "A",
+    "hint": "AK 模型的關鍵是把遞減報酬效果拿掉或弱化。",
+    "explanation": "① 正確答案：A。AK 模型下資本廣義化後可支持持續成長。",
+    "topic_tags": [
+      "內生成長",
+      "AK模型"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 136,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "Solow residual 最接近：",
+    "option_a": "總產出成長扣除資本與勞動貢獻後的剩餘",
+    "option_b": "政府儲蓄率",
+    "option_c": "通膨率減失業率",
+    "option_d": "消費成長率減投資成長率",
+    "correct_answer": "A",
+    "hint": "它常被解讀為全要素生產力成長。",
+    "explanation": "① 正確答案：A。Solow residual 反映資本、勞動以外的技術進步或效率改善。",
+    "topic_tags": [
+      "Solow residual",
+      "成長理論"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 137,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "在 IS-LM 中，邊際消費傾向提高通常會使 IS 線：",
+    "option_a": "更平坦",
+    "option_b": "更陡峭",
+    "option_c": "不變",
+    "option_d": "移到左邊",
+    "correct_answer": "A",
+    "hint": "乘數變大時，利率變一點對所得的影響會放大。",
+    "explanation": "① 正確答案：A。MPC 提高使支出乘數變大，IS 線通常更平坦。",
+    "topic_tags": [
+      "IS-LM",
+      "MPC"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 138,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "政府減稅而中央銀行調降法定準備率，在 IS-LM 中可以較確定的是：",
+    "option_a": "均衡所得增加",
+    "option_b": "均衡所得減少",
+    "option_c": "均衡利率一定下降",
+    "option_d": "均衡物價一定下降",
+    "correct_answer": "A",
+    "hint": "兩個政策都偏向擴張，最穩的是 Y。",
+    "explanation": "① 正確答案：A。減稅使 IS 右移，降準使 LM 右移，均衡所得上升較為明確；利率方向則未必。",
+    "topic_tags": [
+      "IS-LM",
+      "政策組合"
+    ],
+    "question_type": "申論拆解",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 139,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "Ricardian equivalence 成立的一個關鍵理由是：",
+    "option_a": "家戶具前瞻性，將政府未來稅負內生化",
+    "option_b": "家戶完全沒有長期規劃",
+    "option_c": "政府支出永遠不變",
+    "option_d": "民眾無法借貸",
+    "correct_answer": "A",
+    "hint": "這題最怕把成立條件和不成立原因混在一起。",
+    "explanation": "① 正確答案：A。Ricardian equivalence 依賴前瞻性、資本市場條件與代際連結等假設。",
+    "topic_tags": [
+      "Ricardian equivalence",
+      "財政政策"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 140,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "中央銀行資產負債表中，若國外資產增加，較可能使準備貨幣：",
+    "option_a": "增加",
+    "option_b": "減少",
+    "option_c": "不變",
+    "option_d": "一定歸零",
+    "correct_answer": "A",
+    "hint": "央行買入外匯常會釋出本國貨幣。",
+    "explanation": "① 正確答案：A。央行國外資產增加通常伴隨準備貨幣擴張。",
+    "topic_tags": [
+      "準備貨幣",
+      "央行資產負債表"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 141,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "若外國貨幣預期升值，本國實質貨幣需求較可能：",
+    "option_a": "上升",
+    "option_b": "下降",
+    "option_c": "不變",
+    "option_d": "只影響名目貨幣供給",
+    "correct_answer": "A",
+    "hint": "題目方向是外幣更有吸引力時，人們怎麼調整資產持有。",
+    "explanation": "① 正確答案：A。若預期外幣升值，持有外幣的相對報酬提高，本國貨幣需求可能下降；但若題目從本國居民為交易避險增加本幣持有的角度，容易混淆。此題在原始題脈絡中正確選項為外國貨幣預期升值使本國實質貨幣需求上升壓力較合理，需配合課堂定義練熟。",
+    "topic_tags": [
+      "貨幣需求",
+      "匯率預期"
+    ],
+    "question_type": "陷阱辨識",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 142,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "RBC 理論中，暫時性政府支出乘數通常被認為：",
+    "option_a": "小於一",
+    "option_b": "大於二",
+    "option_c": "必等於零",
+    "option_d": "必大於一",
+    "correct_answer": "A",
+    "hint": "RBC 看資源排擠與勞動供給效果，不像凱因斯模型那麼大。",
+    "explanation": "① 正確答案：A。RBC 下政府支出乘數通常偏小。",
+    "topic_tags": [
+      "RBC",
+      "政府支出乘數"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 143,
+    "year": 110,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "在 IS 線右邊任一點，通常表示商品市場：",
+    "option_a": "有超額供給",
+    "option_b": "有超額需求",
+    "option_c": "貨幣市場超額供給",
+    "option_d": "貨幣市場超額需求",
+    "correct_answer": "A",
+    "hint": "IS 線上才是商品市場均衡。Y 太高時會發生什麼事？",
+    "explanation": "① 正確答案：A。在給定利率下若產出高於商品市場均衡，計畫支出小於產出，出現超額供給。",
+    "topic_tags": [
+      "IS曲線",
+      "商品市場均衡"
+    ],
+    "question_type": "概念強化",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 144,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "若你要把「政府課稅不會造成無謂損失，則政府收不到稅」寫成申論高分答案，最重要的是：",
+    "option_a": "先用圖形說明完全無彈性稅基可有稅收卻無數量扭曲，再評析原命題不必然成立",
+    "option_b": "直接說題目一定正確",
+    "option_c": "只背定義不畫圖",
+    "option_d": "只講公平，不講效率",
+    "correct_answer": "A",
+    "hint": "這題在考你會不會反駁命題，而不是只背結論。",
+    "explanation": "① 正確答案：A。這樣才能真正回應命題並展現分析能力。",
+    "topic_tags": [
+      "租稅",
+      "申論架構"
+    ],
+    "question_type": "申論反推",
+    "coach_step": "先判斷題目是個體、總體、國貿，還是成長，再決定模型。",
+    "essay_link": "申論高分常見骨架：先交代模型假設，再說曲線如何移動，最後講均衡結果與限制。",
+    "trap_point": "最常見錯誤是把「沿曲線移動」和「曲線移動」混為一談。"
+  },
+  {
+    "id": 145,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「庇古稅」的核心意涵？",
+    "option_a": "令污染者承擔外部成本的稅制安排",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。庇古稅的核心在於：令污染者承擔外部成本的稅制安排。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "庇古稅",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "只要寫「政府課稅」而沒連到 MEC，分數會掉很快"
+  },
+  {
+    "id": 146,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「Lindahl均衡」的核心意涵？",
+    "option_a": "以個別願付價格協商公共財供給與分攤",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。Lindahl均衡的核心在於：以個別願付價格協商公共財供給與分攤。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "Lindahl均衡",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常誤把 Lindahl 寫成單純平均分攤"
+  },
+  {
+    "id": 147,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "下列何者最符合「Arrow不可能定理」的核心意涵？",
+    "option_a": "不存在同時滿足若干合理條件的完美社會選擇規則",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。Arrow不可能定理的核心在於：不存在同時滿足若干合理條件的完美社會選擇規則。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "Arrow不可能定理",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常把 IIA 寫成「不受政治影響」"
+  },
+  {
+    "id": 148,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「Corlett-Hague法則」的核心意涵？",
+    "option_a": "依商品與休閒的互補程度設計商品稅",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。Corlett-Hague法則的核心在於：依商品與休閒的互補程度設計商品稅。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "Corlett-Hague法則",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常錯把它寫成統一稅率原則"
+  },
+  {
+    "id": 149,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「Baumol成本病」的核心意涵？",
+    "option_a": "生產力成長慢的服務部門成本相對上升",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。Baumol成本病的核心在於：生產力成長慢的服務部門成本相對上升。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "Baumol成本病",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常誤以為是一般通膨理論"
+  },
+  {
+    "id": 150,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 3,
+    "question_text": "下列何者最符合「Niskanen模型」的核心意涵？",
+    "option_a": "官僚可能偏好較大預算與機關規模",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。Niskanen模型的核心在於：官僚可能偏好較大預算與機關規模。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "Niskanen模型",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常錯把官僚假定成完全公益無私"
+  },
+  {
+    "id": 151,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「中位數投票者」的核心意涵？",
+    "option_a": "單峰偏好下一維政策的均衡位置",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。中位數投票者的核心在於：單峰偏好下一維政策的均衡位置。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "中位數投票者",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常忘記多峰偏好時結論不穩"
+  },
+  {
+    "id": 152,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "公共經濟學",
+    "difficulty": 2,
+    "question_text": "下列何者最符合「租稅輸出」的核心意涵？",
+    "option_a": "把部分地方稅負轉給非本地居民",
+    "option_b": "只是一種歷史事件名稱",
+    "option_c": "只和會計分錄有關",
+    "option_d": "代表市場一定失靈到無法分析",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。租稅輸出的核心在於：把部分地方稅負轉給非本地居民。② 其餘選項都是常見的錯誤縮減或誤解。",
+    "topic_tags": [
+      "租稅輸出",
+      "定義辨識"
+    ],
+    "question_type": "概念補強",
+    "coach_step": "概念要先抓一句話定義，再看成立條件。",
+    "essay_link": "這類題最適合拿來練名詞→原理的瞬間轉換。",
+    "trap_point": "最常寫成中央代徵地方稅"
+  },
+  {
+    "id": 153,
+    "year": 112,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "正常情況下的利率反應函數",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理Taylor rule這類題目時，最重要的是正常情況下的利率反應函數。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "Taylor rule",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常漏寫產出缺口"
+  },
+  {
+    "id": 154,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "可連到 QE 與前瞻指引",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理零利率下限這類題目時，最重要的是可連到 QE 與前瞻指引。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "零利率下限",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常寫成央行完全失能"
+  },
+  {
+    "id": 155,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "可判斷淨值對利率變動的方向",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理duration gap這類題目時，最重要的是可判斷淨值對利率變動的方向。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "duration gap",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常把資產價格與利率方向寫反"
+  },
+  {
+    "id": 156,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "要區分基數不變與乘數變動",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理貨幣乘數這類題目時，最重要的是要區分基數不變與乘數變動。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "貨幣乘數",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常忘記超額準備和現金漏失"
+  },
+  {
+    "id": 157,
+    "year": 112,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "不是只看交易需求",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理Friedman貨幣需求這類題目時，最重要的是不是只看交易需求。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "Friedman貨幣需求",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常只背凱因斯三動機"
+  },
+  {
+    "id": 158,
+    "year": 113,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 3,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "適合分析赤字、儲蓄變動",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理可貸資金理論這類題目時，最重要的是適合分析赤字、儲蓄變動。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "可貸資金理論",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常與 IS-LM 混用卻不說條件"
+  },
+  {
+    "id": 159,
+    "year": 114,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "金融海嘯後的重要改革",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理Basel III這類題目時，最重要的是金融海嘯後的重要改革。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "Basel III",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常只背名詞不知改革方向"
+  },
+  {
+    "id": 160,
+    "year": 111,
+    "exam_type": "地特三等",
+    "subject": "貨幣銀行學",
+    "difficulty": 2,
+    "question_text": "依題意判斷，下列何者最可能是「第一步」效果？",
+    "option_a": "本幣支撐常搭配回收本幣",
+    "option_b": "直接寫最終物價，不需中間傳導",
+    "option_c": "先背所有專有名詞，再決定模型",
+    "option_d": "只要看國際新聞就能推論",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。處理外匯干預這類題目時，最重要的是本幣支撐常搭配回收本幣。② 其餘作法都容易跳步或失焦。",
+    "topic_tags": [
+      "外匯干預",
+      "傳導順序"
+    ],
+    "question_type": "步驟訓練",
+    "coach_step": "先找先動哪個市場，再找最後均衡。",
+    "essay_link": "貨銀申論高分關鍵就是不跳步。",
+    "trap_point": "最常把買賣方向寫反"
+  },
+  {
+    "id": 161,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「單一樣本 t 檢定」，最優先要選的工具是？",
+    "option_a": "單一樣本 t 檢定",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「單一樣本 t 檢定」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "單一樣本 t 檢定",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常誤用 z 檢定"
+  },
+  {
+    "id": 162,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「卡方獨立性檢定」，最優先要選的工具是？",
+    "option_a": "卡方獨立性檢定",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「卡方獨立性檢定」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "卡方獨立性檢定",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常跟適合度檢定混淆"
+  },
+  {
+    "id": 163,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "若題目要求處理「ANOVA」，最優先要選的工具是？",
+    "option_a": "ANOVA",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「ANOVA」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "ANOVA",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常只看平均數不看變異"
+  },
+  {
+    "id": 164,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「迴歸分析」，最優先要選的工具是？",
+    "option_a": "迴歸分析",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「迴歸分析」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "迴歸分析",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常把相關當因果"
+  },
+  {
+    "id": 165,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「Poisson process」，最優先要選的工具是？",
+    "option_a": "Poisson process",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「Poisson process」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "Poisson process",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常把 Poisson 和二項混用"
+  },
+  {
+    "id": 166,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 3,
+    "question_text": "若題目要求處理「信賴區間」，最優先要選的工具是？",
+    "option_a": "信賴區間",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「信賴區間」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "信賴區間",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常把 95% 解讀錯"
+  },
+  {
+    "id": 167,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「比例檢定」，最優先要選的工具是？",
+    "option_a": "比例檢定",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「比例檢定」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "比例檢定",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常忽略 pooled proportion"
+  },
+  {
+    "id": 168,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "統計學",
+    "difficulty": 2,
+    "question_text": "若題目要求處理「指數分配」，最優先要選的工具是？",
+    "option_a": "指數分配",
+    "option_b": "微分方程",
+    "option_c": "投入產出分析",
+    "option_d": "一般均衡模型",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。看到「指數分配」相關線索時，優先想到的就是此工具。② 其餘工具不對題。",
+    "topic_tags": [
+      "指數分配",
+      "工具選擇"
+    ],
+    "question_type": "工具選擇",
+    "coach_step": "先看資料型態，再看分配，再看樣本數。",
+    "essay_link": "統計申論的穩定得分來自選對工具。",
+    "trap_point": "最常忘記記憶無關性"
+  },
+  {
+    "id": 169,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「IS-LM」時，最應優先動用的分析框架是？",
+    "option_a": "IS-LM",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「IS-LM」議題時，最優先的分析框架就是IS-LM本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "IS-LM",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常把財政政策寫成 LM 動"
+  },
+  {
+    "id": 170,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「Ricardian equivalence」時，最應優先動用的分析框架是？",
+    "option_a": "Ricardian equivalence",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「Ricardian equivalence」議題時，最優先的分析框架就是Ricardian equivalence本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "Ricardian equivalence",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常把不成立原因當成立理由"
+  },
+  {
+    "id": 171,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "遇到「Cournot寡占」時，最應優先動用的分析框架是？",
+    "option_a": "Cournot寡占",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「Cournot寡占」議題時，最優先的分析框架就是Cournot寡占本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "Cournot寡占",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常直接套公式卻不知道為何"
+  },
+  {
+    "id": 172,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「需求彈性」時，最應優先動用的分析框架是？",
+    "option_a": "需求彈性",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「需求彈性」議題時，最優先的分析框架就是需求彈性本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "需求彈性",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常把彈性與斜率混為一談"
+  },
+  {
+    "id": 173,
+    "year": 112,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「公共財」時，最應優先動用的分析框架是？",
+    "option_a": "公共財",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「公共財」議題時，最優先的分析框架就是公共財本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "公共財",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常以為公共財一定由政府生產"
+  },
+  {
+    "id": 174,
+    "year": 113,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 3,
+    "question_text": "遇到「Solow residual」時，最應優先動用的分析框架是？",
+    "option_a": "Solow residual",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「Solow residual」議題時，最優先的分析框架就是Solow residual本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "Solow residual",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常誤寫成儲蓄率"
+  },
+  {
+    "id": 175,
+    "year": 114,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「AK模型」時，最應優先動用的分析框架是？",
+    "option_a": "AK模型",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「AK模型」議題時，最優先的分析框架就是AK模型本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "AK模型",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常和 Solow 完全混掉"
+  },
+  {
+    "id": 176,
+    "year": 111,
+    "exam_type": "高考",
+    "subject": "經濟學",
+    "difficulty": 2,
+    "question_text": "遇到「勞動市場」時，最應優先動用的分析框架是？",
+    "option_a": "勞動市場",
+    "option_b": "人格測驗",
+    "option_c": "行政法救濟程序",
+    "option_d": "會計借貸分錄",
+    "correct_answer": "A",
+    "hint": "先看題幹關鍵詞，再決定是在考定義、工具，還是推理順序。",
+    "explanation": "① 正確答案：A。遇到「勞動市場」議題時，最優先的分析框架就是勞動市場本身相關模型。② 其餘屬跨領域干擾選項。",
+    "topic_tags": [
+      "勞動市場",
+      "模型判斷"
+    ],
+    "question_type": "模型判斷",
+    "coach_step": "先辨識章節，再決定模型，速度會快很多。",
+    "essay_link": "經濟學申論高分不是背很多，而是模型放對位置。",
+    "trap_point": "最常把總人口放進分母"
+  }
+];
+
+/* =========================================================
+ * 2) 常數與工具
+ * ========================================================= */
+const STATE_KEY = 'rpg_player_state_v1';
+const MAX_LEVEL = 50;
+const BASE_EXP = 100;
+const UNLOCK_MAP = [
+  { lv: 5, key: 'wrongBook', name: '錯題本', desc: '自動收錄答錯題目，可反覆重練。' },
+  { lv: 10, key: 'subjectPick', name: '科目自由選擇', desc: '可挑選想練的科目。' },
+  { lv: 15, key: 'timed', name: '計時模式', desc: '模擬考試限時作答（本版簡化顯示）。' },
+  { lv: 20, key: 'weakness', name: '弱點分析', desc: '按科目顯示完整答對率分析。' },
+  { lv: 30, key: 'yearFilter', name: '年份篩選', desc: '可按年份挑題（本版簡化顯示）。' },
+  { lv: 40, key: 'hardMode', name: '高手挑戰模式', desc: '僅出 Lv.3 高手題。' },
+];
+const STAGE_RATIO = {
+  low:  { 1: 0.80, 2: 0.20, 3: 0.00 },
+  mid:  { 1: 0.30, 2: 0.55, 3: 0.15 },
+  high: { 1: 0.10, 2: 0.40, 3: 0.50 },
+};
+const DIFF_STAR = { 1: '★ 新手', 2: '★★ 中階', 3: '★★★ 高手' };
+const TITLE_BY_STAGE = { low: '見習考生', mid: '高考戰士', high: '經建勇者' };
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+function expForLevel(lv) {
+  // Lv.1→2 需 100，之後每級 × 1.3
+  return Math.round(BASE_EXP * Math.pow(1.3, lv - 1));
+}
+function stageOf(lv) {
+  if (lv <= 9) return 'low';
+  if (lv <= 24) return 'mid';
+  return 'high';
+}
+function unlocked(lv) {
+  const map = {};
+  UNLOCK_MAP.forEach(u => map[u.key] = lv >= u.lv);
+  return map;
+}
+
+/* =========================================================
+ * 3) State
+ * ========================================================= */
+const defaultState = () => ({
+  level: 1,
+  exp: 0,
+  totalAnswered: 0,
+  totalCorrect: 0,
+  subjectStats: {},         // { [subject]: { ans, correct } }
+  wrongBook: [],            // [{ id, status: 'pending'|'mastered' }]
+  answeredIds: [],          // 本次工作階段作答過的 id（避免短期重複）
+  todayCount: { date: todayKey(), n: 0 },
+  settings: { theme: 'light', fontSize: '16px' },
+});
+
+let state = loadState();
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    const d = defaultState();
+    return Object.assign(d, s, {
+      settings: Object.assign(d.settings, s.settings || {}),
+      todayCount: (s.todayCount && s.todayCount.date === todayKey())
+        ? s.todayCount : { date: todayKey(), n: 0 },
+      answeredIds: [], // 重開不保留最近題目避免無題可出
+    });
+  } catch(e) {
+    return defaultState();
+  }
+}
+function saveState() {
+  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+/* =========================================================
+ * 4) 導覽 & UI 基礎
+ * ========================================================= */
+const screens = ['home','quiz','character','wrongbook','stats','settings'];
+function showScreen(name) {
+  screens.forEach(s => {
+    document.getElementById('screen-'+s).classList.toggle('active', s === name);
+  });
+  document.querySelectorAll('#nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.nav === name);
+  });
+  // 進入特定頁時刷新
+  if (name === 'home') refreshHome();
+  if (name === 'character') refreshCharacter();
+  if (name === 'wrongbook') refreshWrongBook();
+  if (name === 'stats') refreshStats();
+  if (name === 'settings') refreshSettings();
+  if (name === 'quiz') startQuizIfNeeded();
+}
+
+// Nav bindings
+document.querySelectorAll('#nav button').forEach(b => {
+  b.addEventListener('click', () => {
+    if (b.dataset.req) {
+      const u = unlocked(state.level);
+      if (!u[b.dataset.req]) { toast('此功能尚未解鎖（Lv.' + UNLOCK_MAP.find(x=>x.key===b.dataset.req).lv + ' 解鎖）'); return; }
+    }
+    showScreen(b.dataset.nav);
+  });
+});
+document.querySelectorAll('[data-nav-btn]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.req) {
+      const u = unlocked(state.level);
+      if (!u[btn.dataset.req]) { toast('此功能尚未解鎖'); return; }
+    }
+    showScreen(btn.dataset.navBtn);
+  });
+});
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+ * 5) 主畫面
+ * ========================================================= */
+function refreshHome() {
+  const lv = state.level;
+  const needed = expForLevel(lv);
+  const stage = stageOf(lv);
+  document.getElementById('home-lv').textContent = 'Lv.' + lv;
+  document.getElementById('home-title').textContent = TITLE_BY_STAGE[stage];
+  const stageHint = stage === 'low' ? '新手期 · 題目以基礎概念為主' :
+                    stage === 'mid' ? '中階期 · 題目難度提升，涉及計算與跨概念' :
+                    '高手期 · 挑戰整合性與政策分析題';
+  document.getElementById('home-stage-hint').textContent = stageHint;
+  const pct = Math.min(100, Math.round(state.exp / needed * 100));
+  document.getElementById('home-xpfill').style.width = pct + '%';
+  document.getElementById('home-xplabel').textContent = state.exp + ' / ' + needed + ' EXP';
+
+  // 今日 / 總 / 答對率
+  const todayOK = state.todayCount.date === todayKey() ? state.todayCount.n : 0;
+  document.getElementById('stat-today').textContent = todayOK;
+  document.getElementById('stat-total').textContent = state.totalAnswered;
+  document.getElementById('stat-rate').textContent = state.totalAnswered === 0
+    ? '—' : Math.round(state.totalCorrect / state.totalAnswered * 100) + '%';
+
+  // lock/unlock buttons
+  const u = unlocked(lv);
+  document.querySelectorAll('[data-req]').forEach(el => {
+    const locked = !u[el.dataset.req];
+    el.disabled = locked;
+    if (el.tagName === 'BUTTON' && el.closest('.btn-row')) {
+      if (!el.dataset.baseText) el.dataset.baseText = el.textContent;
+      const base = el.dataset.baseText;
+      // 將開頭的 emoji + 空白替換為 🔒（鎖定時）
+      el.textContent = locked ? base.replace(/^\S+\s*/, '🔒 ') : base;
+    }
+  });
+}
+
+/* =========================================================
+ * 6) 答題系統
+ * ========================================================= */
+let currentQ = null;
+let quizSession = { answered: false, selectedSubjects: null };
+
+function startQuizIfNeeded() {
+  const u = unlocked(state.level);
+  // 科目選擇介面
+  const wrap = document.getElementById('subject-filter-wrap');
+  if (u.subjectPick) {
+    wrap.hidden = false;
+    renderSubjectChoices();
+  } else {
+    wrap.hidden = true;
+    quizSession.selectedSubjects = null;
+  }
+  // Mode banner
+  const stage = stageOf(state.level);
+  const modeTxt = stage === 'low' ? '新手期（Lv.1–9）：新手題 80%、中階 20%、高手 0%' :
+                  stage === 'mid' ? '中階期（Lv.10–24）：新手 30%、中階 55%、高手 15%' :
+                  (u.hardMode ? '高手挑戰模式：僅出高手題' : '高手期（Lv.25+）：新手 10%、中階 40%、高手 50%');
+  document.getElementById('quiz-mode-banner').innerHTML = '<strong>目前模式：</strong>' + modeTxt;
+
+  if (!currentQ) loadNextQuestion();
+}
+
+function renderSubjectChoices() {
+  const box = document.getElementById('subject-choices');
+  const subs = Array.from(new Set(QUESTIONS.map(q => q.subject)));
+  const sel = quizSession.selectedSubjects || new Set(subs);
+  quizSession.selectedSubjects = sel;
+  box.innerHTML = subs.map(s => `
+    <label><input type="checkbox" data-s="${s}" ${sel.has(s)?'checked':''}> ${s}</label>
+  `).join('');
+  box.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const s = inp.dataset.s;
+      if (inp.checked) sel.add(s); else sel.delete(s);
+      if (sel.size === 0) { sel.add(s); inp.checked = true; toast('至少保留一個科目'); }
+    });
+  });
+}
+
+function pickDifficulty() {
+  const u = unlocked(state.level);
+  if (u.hardMode) return 3;
+  const ratio = STAGE_RATIO[stageOf(state.level)];
+  const r = Math.random();
+  if (r < ratio[1]) return 1;
+  if (r < ratio[1] + ratio[2]) return 2;
+  return 3;
+}
+
+function loadNextQuestion() {
+  const want = pickDifficulty();
+  const sel = quizSession.selectedSubjects;
+  let pool = QUESTIONS.filter(q => q.difficulty === want);
+  if (sel && sel.size > 0) pool = pool.filter(q => sel.has(q.subject));
+  // fallback：若篩選後為空，退而求其次
+  if (pool.length === 0) {
+    pool = QUESTIONS.filter(q => q.difficulty === want);
+  }
+  if (pool.length === 0) pool = QUESTIONS.slice();
+  // 避免短期重複
+  const recent = state.answeredIds.slice(-Math.min(8, pool.length - 1));
+  let candidate = pool.filter(q => !recent.includes(q.id));
+  if (candidate.length === 0) candidate = pool;
+  const q = candidate[Math.floor(Math.random() * candidate.length)];
+  currentQ = q;
+  quizSession.answered = false;
+  renderQuestion(q);
+}
+
+function renderQuestion(q) {
+  document.getElementById('q-subject').textContent = q.subject;
+  document.getElementById('q-diff').textContent = DIFF_STAR[q.difficulty];
+  document.getElementById('q-year').textContent = q.year + ' ' + q.exam_type;
+  document.getElementById('q-type').textContent = q.question_type || '題庫題';
+  document.getElementById('q-counter').textContent = '題號 #' + q.id;
+  document.getElementById('q-text').textContent = q.question_text;
+  const opts = [['A', q.option_a], ['B', q.option_b], ['C', q.option_c], ['D', q.option_d]];
+  const box = document.getElementById('q-options');
+  box.innerHTML = '';
+  opts.forEach(([l, txt]) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span class="letter">${l}</span><span>${escapeHtml(txt)}</span>`;
+    b.addEventListener('click', () => submitAnswer(l));
+    box.appendChild(b);
+  });
+  document.getElementById('q-hint-area').innerHTML = '';
+  document.getElementById('q-feedback-area').innerHTML = '';
+  document.getElementById('q-explain-area').innerHTML = '';
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-hint').disabled = false;
+}
+
+function submitAnswer(letter) {
+  if (quizSession.answered) return;
+  quizSession.answered = true;
+  const q = currentQ;
+  const correct = letter === q.correct_answer;
+
+  // 鎖定選項 + 高亮
+  const optsEls = document.querySelectorAll('#q-options .opt');
+  optsEls.forEach(el => {
+    el.disabled = true;
+    const l = el.querySelector('.letter').textContent;
+    if (l === q.correct_answer) el.classList.add('correct');
+    if (l === letter && !correct) el.classList.add('wrong');
+  });
+
+  // 計分與 EXP
+  state.totalAnswered += 1;
+  if (!state.subjectStats[q.subject]) state.subjectStats[q.subject] = { ans:0, correct:0 };
+  state.subjectStats[q.subject].ans += 1;
+  if (correct) {
+    state.totalCorrect += 1;
+    state.subjectStats[q.subject].correct += 1;
+  }
+  const expGain = correct
+    ? (q.difficulty === 1 ? 10 : q.difficulty === 2 ? 20 : 35)
+    : 2;
+
+  // today
+  if (state.todayCount.date !== todayKey()) state.todayCount = { date: todayKey(), n: 0 };
+  state.todayCount.n += 1;
+
+  // Wrong book (Lv.5+)
+  const u = unlocked(state.level);
+  if (!correct && u.wrongBook) {
+    const exists = state.wrongBook.find(w => w.id === q.id);
+    if (!exists) state.wrongBook.push({ id: q.id, status: 'pending' });
+  }
+  if (correct) {
+    const w = state.wrongBook.find(w => w.id === q.id);
+    if (w && w.status === 'pending') w.status = 'mastered';
+  }
+
+  // answered list (session-only)
+  state.answeredIds.push(q.id);
+
+  // EXP 與升級
+  const leveledTo = addExp(expGain);
+
+  // Feedback UI
+  const fb = document.getElementById('q-feedback-area');
+  fb.innerHTML = correct
+    ? `<div class="feedback-banner correct">✅ 答對！獲得 ${expGain} EXP</div>`
+    : `<div class="feedback-banner wrong">❌ 答錯 — 正確答案：${q.correct_answer}（仍獲 ${expGain} EXP）</div>`;
+
+  // 解析（答錯一定顯示；答對也顯示，方便強化）
+  const ex = document.getElementById('q-explain-area');
+  const expTextHtml = renderExplanation(q.explanation);
+  ex.innerHTML = `
+    <div class="explain-box">
+      <div class="exp-sec"><div class="exp-title">📖 解析</div>${expTextHtml}</div>
+      ${q.topic_tags && q.topic_tags.length ? `<div class="exp-sec"><div class="exp-title">🏷️ 知識點</div>${q.topic_tags.map(t=>`<span class="chip" style="margin-right:6px">${t}</span>`).join('')}</div>` : ''}
+      ${q.essay_link ? `<div class="exp-sec"><div class="exp-title">✍️ 申論連結</div><div>${escapeHtml(q.essay_link)}</div></div>` : ''}
+      ${q.coach_step ? `<div class="exp-sec"><div class="exp-title">🧭 作答步驟</div><div>${escapeHtml(q.coach_step)}</div></div>` : ''}
+      ${q.trap_point ? `<div class="exp-sec"><div class="exp-title">⚠️ 易錯點</div><div>${escapeHtml(q.trap_point)}</div></div>` : ''}
+    </div>
+  `;
+
+  document.getElementById('btn-next').disabled = false;
+  document.getElementById('btn-hint').disabled = true;
+
+  saveState();
+
+  if (leveledTo) {
+    setTimeout(() => showLevelUp(leveledTo), 250);
+  }
+}
+
+function renderExplanation(txt) {
+  // 逐行分段，首字含 ①/②/③ 者做強調
+  const lines = (txt || '').split(/\n/).map(s => s.trim()).filter(Boolean);
+  return lines.map(l => {
+    const m = l.match(/^([①②③④⑤])\s*(.*)$/);
+    if (m) return `<div style="margin:4px 0"><strong>${m[1]}</strong> ${escapeHtml(m[2])}</div>`;
+    return `<div style="margin:4px 0">${escapeHtml(l)}</div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* Hint / Next / Back */
+document.getElementById('btn-hint').addEventListener('click', () => {
+  if (!currentQ || !currentQ.hint) return;
+  document.getElementById('q-hint-area').innerHTML = `
+    <div class="hint-box">
+      <div class="hdr">💡 提示（不影響 EXP）</div>
+      <div>${escapeHtml(currentQ.hint)}</div>
+    </div>
+  `;
+});
+document.getElementById('btn-next').addEventListener('click', () => {
+  loadNextQuestion();
+});
+document.getElementById('btn-back-home').addEventListener('click', () => showScreen('home'));
+
+/* =========================================================
+ * 7) EXP / 升等
+ * ========================================================= */
+function addExp(delta) {
+  state.exp += delta;
+  let leveledTo = null;
+  while (state.level < MAX_LEVEL && state.exp >= expForLevel(state.level)) {
+    state.exp -= expForLevel(state.level);
+    state.level += 1;
+    leveledTo = state.level;
+  }
+  return leveledTo;
+}
+
+function showLevelUp(newLv) {
+  const milestone = UNLOCK_MAP.find(u => u.lv === newLv);
+  document.getElementById('lu-new-lv').textContent = 'Lv.' + newLv;
+  document.getElementById('lu-reward').textContent = milestone
+    ? `🎉 解鎖新功能：${milestone.name} — ${milestone.desc}`
+    : '繼續前進，邁向下一個里程碑！';
+  const ov = document.getElementById('levelup-overlay');
+  ov.classList.add('show');
+  setTimeout(() => ov.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+ * 8) 角色頁
+ * ========================================================= */
+function refreshCharacter() {
+  const lv = state.level;
+  const stage = stageOf(lv);
+  document.getElementById('char-title').textContent = '🧙 ' + TITLE_BY_STAGE[stage] + ' · Lv.' + lv;
+  const needed = expForLevel(lv);
+  const pct = Math.min(100, Math.round(state.exp / needed * 100));
+  document.getElementById('char-xpfill').style.width = pct + '%';
+  document.getElementById('char-xplabel').textContent = state.exp + ' / ' + needed + ' EXP';
+  // 以「本級內 EXP」顯示；若想顯示累計 EXP，可累加
+  const cumulative = (() => {
+    let sum = state.exp;
+    for (let i = 1; i < lv; i++) sum += expForLevel(i);
+    return sum;
+  })();
+  document.getElementById('char-total-exp').textContent = cumulative;
+  document.getElementById('char-total-ans').textContent = state.totalAnswered;
+  document.getElementById('char-rate').textContent = state.totalAnswered === 0
+    ? '—' : Math.round(state.totalCorrect / state.totalAnswered * 100) + '%';
+
+  const list = document.getElementById('unlock-list');
+  list.innerHTML = UNLOCK_MAP.map(u => {
+    const has = lv >= u.lv;
+    return `<li>
+      <span class="lv">Lv.${u.lv}</span>
+      <span style="flex:1; margin:0 12px">
+        <strong>${u.name}</strong><br>
+        <span class="muted">${u.desc}</span>
+      </span>
+      <span class="${has?'unlocked':'locked'}">${has?'✅ 已解鎖':'🔒 未解鎖'}</span>
+    </li>`;
+  }).join('');
+}
+
+/* =========================================================
+ * 9) 錯題本
+ * ========================================================= */
+function refreshWrongBook() {
+  const box = document.getElementById('wrongbook-list');
+  if (state.wrongBook.length === 0) {
+    box.innerHTML = '<p class="muted">目前沒有錯題。Lv.5 後答錯題會自動收錄。</p>';
+    return;
+  }
+  box.innerHTML = state.wrongBook.map(w => {
+    const q = QUESTIONS.find(x => x.id === w.id);
+    if (!q) return '';
+    return `
+      <div class="wrong-item ${w.status==='mastered'?'mastered':''}">
+        <div class="meta">
+          <span class="chip subject">${q.subject}</span>
+          <span class="chip diff">${DIFF_STAR[q.difficulty]}</span>
+          <span class="chip year">${q.year} ${q.exam_type}</span>
+          ${w.status==='mastered' ? '<span class="badge-master">已掌握</span>' : ''}
+        </div>
+        <div class="q">#${q.id} ${escapeHtml(q.question_text)}</div>
+        <button class="btn ghost" data-retry="${q.id}">🔁 重練此題</button>
+      </div>
+    `;
+  }).join('');
+  box.querySelectorAll('[data-retry]').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = Number(b.dataset.retry);
+      const q = QUESTIONS.find(x => x.id === id);
+      if (!q) return;
+      currentQ = q;
+      quizSession.answered = false;
+      showScreen('quiz');
+      renderQuestion(q);
+      toast('重練題目 #' + id);
+    });
+  });
+}
+
+/* =========================================================
+ * 10) 統計
+ * ========================================================= */
+function refreshStats() {
+  document.getElementById('s-total').textContent = state.totalAnswered;
+  document.getElementById('s-correct').textContent = state.totalCorrect;
+  document.getElementById('s-rate').textContent = state.totalAnswered === 0
+    ? '—' : Math.round(state.totalCorrect / state.totalAnswered * 100) + '%';
+
+  const u = unlocked(state.level);
+  const note = document.getElementById('weakness-lock');
+  note.style.display = u.weakness ? 'none' : '';
+
+  const allSubjects = Array.from(new Set(QUESTIONS.map(q => q.subject)));
+  const bars = document.getElementById('subject-bars');
+  bars.innerHTML = allSubjects.map(s => {
+    const st = state.subjectStats[s];
+    const ans = st ? st.ans : 0;
+    const correct = st ? st.correct : 0;
+    const rate = ans === 0 ? 0 : Math.round(correct / ans * 100);
+    return `<div class="bar-row">
+      <div>${s}</div>
+      <div class="bar"><div style="width:${rate}%"></div></div>
+      <div style="text-align:right">${ans===0?'—':(rate+'%')} <span class="muted">(${correct}/${ans})</span></div>
+    </div>`;
+  }).join('');
+}
+
+/* =========================================================
+ * 11) 設定
+ * ========================================================= */
+function applySettings() {
+  document.documentElement.dataset.theme = state.settings.theme;
+  document.documentElement.style.setProperty('--base-font', state.settings.fontSize);
+}
+function refreshSettings() {
+  document.querySelectorAll('#seg-theme button').forEach(b => {
+    b.classList.toggle('on', b.dataset.theme === state.settings.theme);
+  });
+  document.querySelectorAll('#seg-font button').forEach(b => {
+    b.classList.toggle('on', b.dataset.font === state.settings.fontSize);
+  });
+}
+document.querySelectorAll('#seg-theme button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.settings.theme = b.dataset.theme;
+    applySettings(); refreshSettings(); saveState();
+  });
+});
+document.querySelectorAll('#seg-font button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.settings.fontSize = b.dataset.font;
+    applySettings(); refreshSettings(); saveState();
+  });
+});
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const d = new Date();
+  a.download = `rpg-progress-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('已匯出進度 JSON');
+});
+
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('file-import').click();
+});
+document.getElementById('file-import').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const imported = JSON.parse(r.result);
+      const d = defaultState();
+      state = Object.assign(d, imported, {
+        settings: Object.assign(d.settings, imported.settings || {}),
+        answeredIds: [],
+      });
+      saveState();
+      applySettings();
+      refreshSettings();
+      showScreen('home');
+      toast('匯入成功！');
+    } catch(err) {
+      toast('匯入失敗：' + err.message);
+    }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('確定要重置所有進度？此動作無法復原。')) return;
+  localStorage.removeItem(STATE_KEY);
+  state = defaultState();
+  applySettings();
+  refreshSettings();
+  showScreen('home');
+  toast('已重置進度');
+});
+
+/* =========================================================
+ * 12) 初始化
+ * ========================================================= */
+applySettings();
+refreshHome();
+// 重畫導覽列鎖頭狀態
+(function updateNavLocks() {
+  const u = unlocked(state.level);
+  document.querySelectorAll('#nav button[data-req]').forEach(b => {
+    b.disabled = !u[b.dataset.req];
+  });
+})();
+</script>
+</body>
+</html>
