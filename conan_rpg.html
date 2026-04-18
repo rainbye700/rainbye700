@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>柯南的謎城冒險</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel2: #1f2937;
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent2: #f59e0b;
+      --danger: #ef4444;
+      --ok: #22c55e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0b1020, #151b2f 45%, #0a1020);
+      color: var(--text);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .shell {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 800px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .game-wrap {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #0b1220;
+      border-radius: 12px;
+      image-rendering: pixelated;
+      display: block;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .ui {
+      display: grid;
+      gap: 14px;
+    }
+    .panel {
+      background: rgba(17,24,39,0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.24);
+    }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 16px; margin-bottom: 10px; color: #cbd5e1; }
+    .sub { color: #94a3b8; font-size: 13px; line-height: 1.5; }
+    .stats { display: grid; gap: 8px; }
+    .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+    .bar {
+      height: 10px;
+      background: #243041;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #34d399);
+      transition: width .25s ease;
+    }
+    .dialog {
+      min-height: 150px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 14px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(96,165,250,0.12);
+      color: #bfdbfe;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .log {
+      max-height: 170px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #d1d5db;
+    }
+    .log div { margin-bottom: 6px; }
+    .btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    button {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+    }
+    button.secondary { background: linear-gradient(135deg, #374151, #4b5563); }
+    .footer-note { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+    @media (max-width: 1040px) {
+      .shell { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="game-wrap">
+      <canvas id="game" width="640" height="640" aria-label="柯南 RPG 遊戲畫面"></canvas>
+    </div>
+
+    <div class="ui">
+      <section class="panel">
+        <div class="badge">偵探 JRPG · 網頁版</div>
+        <h1>柯南的謎城冒險</h1>
+        <p class="sub">受經典掌機 RPG 氣氛啟發的原創小遊戲。你將操作柯南在城鎮與森林中蒐集線索、擊退黑衣追兵，最後破解鐘塔之謎。</p>
+      </section>
+
+      <section class="panel">
+        <h2>角色狀態</h2>
+        <div class="stats">
+          <div>
+            <div class="row"><span>HP</span><span id="hpText">30 / 30</span></div>
+            <div class="bar"><span id="hpBar"></span></div>
+          </div>
+          <div class="row"><span>等級</span><span id="levelText">1</span></div>
+          <div class="row"><span>EXP</span><span id="expText">0 / 12</span></div>
+          <div class="row"><span>推理幣</span><span id="coinText">0</span></div>
+          <div class="row"><span>線索</span><span id="clueText">0 / 3</span></div>
+          <div class="row"><span>任務</span><span id="questText">和博士談談</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>訊息視窗</h2>
+        <div class="dialog" id="dialog">歡迎來到米花謎城。
+方向鍵 / WASD：移動
+空白鍵：互動 / 對話 / 確認
+B：在戰鬥中丟出麻醉手錶
+R：重新開始</div>
+        <div class="btns">
+          <button id="restartBtn">重新開始</button>
+          <button id="helpBtn" class="secondary">顯示操作</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>操作方式</h2>
+        <div class="controls">
+          <div>移動：方向鍵 / WASD</div>
+          <div>互動：空白鍵</div>
+          <div>戰鬥攻擊：空白鍵</div>
+          <div>特殊技能：B</div>
+          <div>重新開始：R</div>
+          <div>目標：找齊 3 個線索</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>事件紀錄</h2>
+        <div class="log" id="log"></div>
+      </section>
+
+      <section class="panel footer-note">
+        這是單檔 HTML 小遊戲，不需安裝，下載後直接用瀏覽器開啟即可。若你之後想要，我也可以再幫你擴充成多地圖、背包、存檔、BGM 或更像掌機 JRPG 的版本。
+      </section>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const TILE = 32;
+  const MAP_W = 20;
+  const MAP_H = 20;
+
+  const COLORS = {
+    grass: '#3d8b4f',
+    grass2: '#2e6d3d',
+    path: '#b9925e',
+    tree: '#1f4d2c',
+    water: '#2563eb',
+    stone: '#7c8896',
+    house: '#c2410c',
+    roof: '#7f1d1d',
+    tower: '#6b7280',
+    dark: '#0f172a',
+    white: '#f8fafc',
+    conanBlue: '#60a5fa',
+    conanRed: '#ef4444',
+    enemy: '#111827',
+    clue: '#fde68a',
+  };
+
+  const ui = {
+    dialog: document.getElementById('dialog'),
+    hpText: document.getElementById('hpText'),
+    hpBar: document.getElementById('hpBar'),
+    levelText: document.getElementById('levelText'),
+    expText: document.getElementById('expText'),
+    coinText: document.getElementById('coinText'),
+    clueText: document.getElementById('clueText'),
+    questText: document.getElementById('questText'),
+    log: document.getElementById('log')
+  };
+
+  const map = [
+    "####################",
+    "#.....TTTTTT.......#",
+    "#..A..TT....T..C...#",
+    "#.....TT....T......#",
+    "#..====....TTTT....#",
+    "#.............T....#",
+    "#....~~~~~.........#",
+    "#....~~~~~....######",
+    "#....~~~~~....#...##",
+    "#.............#.K.##",
+    "#......#####..#...##",
+    "#......#...#..######",
+    "#..B...#...#.......#",
+    "#......#...#.......#",
+    "#......#####..TT...#",
+    "#.............TT...#",
+    "#..S..........TT...#",
+    "#..............D...#",
+    "#..................#",
+    "####################"
+  ].map(r => r.replace(/\n/g, ''));
+
+  const state = {
+    mode: 'world',
+    player: null,
+    npcs: [],
+    clues: [],
+    battle: null,
+    keys: {},
+    lastMove: 0,
+    worldMessage: '',
+    quest: '和博士談談',
+    bossUnlocked: false,
+    ending: false,
+    events: []
+  };
+
+  function basePlayer() {
+    return {
+      x: 3,
+      y: 16,
+      hp: 30,
+      maxHp: 30,
+      atk: 6,
+      level: 1,
+      exp: 0,
+      nextExp: 12,
+      coins: 0,
+      clues: 0,
+      facing: 'down',
+      stunShots: 3,
+      invuln: 0,
+    };
+  }
+
+  function resetGame() {
+    state.mode = 'world';
+    state.player = basePlayer();
+    state.npcs = [
+      { x: 3, y: 2, name: '阿笠博士', talk: talkProfessor },
+      { x: 16, y: 2, name: '小蘭', talk: talkRan },
+      { x: 9, y: 9, name: '灰原', talk: talkAi },
+      { x: 16, y: 17, name: '鐘塔守衛', talk: talkGate }
+    ];
+    state.clues = [
+      { x: 5, y: 4, got: false, text: '你在草地上發現了「黑色鈕扣」。' },
+      { x: 12, y: 15, got: false, text: '你在森林邊找到一張「被撕碎的暗號紙」。' },
+      { x: 17, y: 6, got: false, text: '你在塔旁撿到「沾有藥粉的試管碎片」。' }
+    ];
+    state.battle = null;
+    state.quest = '和博士談談';
+    state.bossUnlocked = false;
+    state.ending = false;
+    state.events = [];
+    setDialog('歡迎來到米花謎城。\n先去找阿笠博士，看看發生了什麼事。');
+    addLog('新的冒險開始了。');
+    updateUI();
+  }
+
+  function setDialog(text) { ui.dialog.textContent = text; }
+  function addLog(text) {
+    state.events.unshift(text);
+    state.events = state.events.slice(0, 18);
+    ui.log.innerHTML = state.events.map(v => `<div>${escapeHtml(v)}</div>`).join('');
+  }
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function updateUI() {
+    const p = state.player;
+    ui.hpText.textContent = `${p.hp} / ${p.maxHp}`;
+    ui.hpBar.style.width = `${(p.hp / p.maxHp) * 100}%`;
+    ui.levelText.textContent = String(p.level);
+    ui.expText.textContent = `${p.exp} / ${p.nextExp}`;
+    ui.coinText.textContent = String(p.coins);
+    ui.clueText.textContent = `${p.clues} / 3`;
+    ui.questText.textContent = state.quest;
+  }
+
+  function isWall(x, y) {
+    const ch = map[y]?.[x];
+    if (!ch) return true;
+    if (ch === '#' || ch === 'T' || ch === '~') return true;
+    if (ch === 'D' && !state.bossUnlocked) return true;
+    return false;
+  }
+
+  function tileAt(x, y) { return map[y]?.[x] || '#'; }
+
+  function move(dx, dy) {
+    const p = state.player;
+    if (dx === 1) p.facing = 'right';
+    if (dx === -1) p.facing = 'left';
+    if (dy === 1) p.facing = 'down';
+    if (dy === -1) p.facing = 'up';
+    const nx = p.x + dx;
+    const ny = p.y + dy;
+    if (isWall(nx, ny)) return;
+    if (state.npcs.some(n => n.x === nx && n.y === ny)) return;
+    p.x = nx;
+    p.y = ny;
+    handleStep();
+  }
+
+  function handleStep() {
+    const p = state.player;
+    const clue = state.clues.find(c => !c.got && c.x === p.x && c.y === p.y);
+    if (clue) {
+      clue.got = true;
+      p.clues += 1;
+      p.coins += 5;
+      setDialog(clue.text + `\n目前線索：${p.clues}/3`);
+      addLog(`取得線索：${clue.text.replace('你在','').replace('。','')}`);
+      if (p.clues >= 3) {
+        state.quest = '回去找灰原分析線索';
+        addLog('三個線索都收集到了。');
+      }
+      updateUI();
+      return;
+    }
+
+    const ch = tileAt(p.x, p.y);
+    if ((ch === '.' || ch === '=') && Math.random() < 0.08 && !state.ending) {
+      startBattle(randomEnemy());
+    }
+  }
+
+  function randomEnemy() {
+    const pool = [
+      { name: '黑衣追兵', hp: 18, atk: 4, exp: 5, coins: 4 },
+      { name: '可疑研究員', hp: 16, atk: 5, exp: 6, coins: 5 },
+      { name: '走私打手', hp: 20, atk: 5, exp: 7, coins: 6 }
+    ];
+    return structuredClone(pool[(Math.random() * pool.length) | 0]);
+  }
+
+  function startBattle(enemy) {
+    state.mode = 'battle';
+    state.battle = { enemy, turn: 'player', message: `遭遇 ${enemy.name}！\n空白鍵：攻擊　B：麻醉手錶（剩 ${state.player.stunShots} 次）` };
+    setDialog(state.battle.message);
+    addLog(`遭遇戰：${enemy.name}`);
+  }
+
+  function battleAction(action) {
+    if (state.mode !== 'battle') return;
+    const p = state.player;
+    const e = state.battle.enemy;
+
+    if (action === 'stun') {
+      if (p.stunShots <= 0) {
+        setDialog(`麻醉手錶已用完！\n空白鍵：一般攻擊`);
+        return;
+      }
+      p.stunShots -= 1;
+      const dmg = 9 + ((Math.random() * 4) | 0);
+      e.hp -= dmg;
+      let text = `柯南射出麻醉手錶！對 ${e.name} 造成 ${dmg} 點傷害。`;
+      if (e.hp <= 0) {
+        winBattle();
+        setDialog(text + '\n敵人倒下了！');
+        return;
+      }
+      text += `\n${e.name} 還剩 ${e.hp} HP。`;
+      enemyTurn(text);
+      updateUI();
+      return;
+    }
+
+    const dmg = p.atk + ((Math.random() * 4) | 0);
+    e.hp -= dmg;
+    let text = `柯南用足球腰帶踢出強力一擊！對 ${e.name} 造成 ${dmg} 點傷害。`;
+    if (e.hp <= 0) {
+      winBattle();
+      setDialog(text + '\n敵人倒下了！');
+      return;
+    }
+    text += `\n${e.name} 還剩 ${e.hp} HP。`;
+    enemyTurn(text);
+    updateUI();
+  }
+
+  function enemyTurn(prefix) {
+    const p = state.player;
+    const e = state.battle.enemy;
+    const dmg = Math.max(2, e.atk + ((Math.random() * 3) | 0) - (p.level - 1));
+    p.hp -= dmg;
+    let text = `${prefix}\n${e.name} 反擊，柯南受到 ${dmg} 點傷害。`;
+    if (p.hp <= 0) {
+      p.hp = 0;
+      state.mode = 'world';
+      state.battle = null;
+      setDialog(text + '\n\n柯南暫時撤退了……按 R 重新開始。');
+      addLog('戰敗。');
+      updateUI();
+      return;
+    }
+    setDialog(text + `\n柯南剩下 ${p.hp} HP。\n空白鍵：攻擊　B：麻醉手錶`);
+  }
+
+  function winBattle() {
+    const p = state.player;
+    const e = state.battle.enemy;
+    p.exp += e.exp;
+    p.coins += e.coins;
+    addLog(`擊敗 ${e.name}，獲得 EXP ${e.exp}、推理幣 ${e.coins}。`);
+    state.mode = 'world';
+    state.battle = null;
+    while (p.exp >= p.nextExp) {
+      p.exp -= p.nextExp;
+      p.level += 1;
+      p.nextExp += 8;
+      p.maxHp += 6;
+      p.hp = p.maxHp;
+      p.atk += 2;
+      p.stunShots += 1;
+      addLog(`升到 ${p.level} 級！HP、攻擊力與麻醉手錶次數提升。`);
+      setDialog(`柯南升級了！\n等級提升至 ${p.level}，HP 全滿。`);
+    }
+    updateUI();
+  }
+
+  function interact() {
+    if (state.mode === 'battle') {
+      battleAction('attack');
+      return;
+    }
+    const p = state.player;
+    const dir = facingDelta(p.facing);
+    const tx = p.x + dir.dx;
+    const ty = p.y + dir.dy;
+    const npc = state.npcs.find(n => n.x === tx && n.y === ty);
+    if (npc) {
+      npc.talk();
+      return;
+    }
+    const ch = tileAt(tx, ty);
+    if (ch === 'D' && state.bossUnlocked) {
+      startBossBattle();
+      return;
+    }
+    setDialog('這裡沒有特別的東西。');
+  }
+
+  function facingDelta(facing) {
+    return ({ up:{dx:0,dy:-1}, down:{dx:0,dy:1}, left:{dx:-1,dy:0}, right:{dx:1,dy:0} })[facing];
+  }
+
+  function talkProfessor() {
+    if (state.player.clues === 0) {
+      state.quest = '尋找 3 個線索';
+      setDialog('阿笠博士：\n「柯南，鐘塔附近出現了可疑的黑衣人。去城鎮和森林找找看，有三個關鍵線索散落在外面！」');
+      addLog('阿笠博士交付任務：蒐集 3 個線索。');
+    } else {
+      setDialog(`阿笠博士：\n「目前找到 ${state.player.clues} 個線索了。快繼續調查吧！」`);
+    }
+    updateUI();
+  }
+
+  function talkRan() {
+    if (state.player.coins >= 10 && state.player.maxHp < 40) {
+      state.player.coins -= 10;
+      state.player.maxHp += 8;
+      state.player.hp = Math.min(state.player.maxHp, state.player.hp + 8);
+      setDialog('小蘭：\n「你看起來太勉強了，先休息一下吧！」\n你的 HP 上限提升了 8。');
+      addLog('小蘭鼓勵了柯南，HP 上限提升。');
+    } else {
+      setDialog('小蘭：\n「柯南，小心一點喔！如果你累了，再來找我。」\n（有 10 枚推理幣時可獲得一次支援）');
+    }
+    updateUI();
+  }
+
+  function talkAi() {
+    if (state.player.clues < 3) {
+      setDialog('灰原：\n「先把線索找齊。沒有資料，推理就只是猜測。」');
+      return;
+    }
+    if (!state.bossUnlocked) {
+      state.bossUnlocked = true;
+      state.quest = '前往鐘塔門前，揭穿真相';
+      setDialog('灰原：\n「這三樣東西都指向同一個地方——鐘塔地下室。門禁我已經破解了，你可以去最後的門前。」');
+      addLog('灰原破解了鐘塔的門禁。');
+      updateUI();
+      return;
+    }
+    setDialog('灰原：\n「門已經開了。剩下的就看你的了，名偵探。」');
+  }
+
+  function talkGate() {
+    if (!state.bossUnlocked) {
+      setDialog('鐘塔守衛：\n「前方禁止進入。」\n看來需要先取得足夠線索，才能找到突破口。');
+      return;
+    }
+    setDialog('鐘塔守衛：\n「……你居然查到這裡了。」\n往前一步，就是最後對決。');
+  }
+
+  function startBossBattle() {
+    state.mode = 'battle';
+    state.battle = {
+      enemy: { name: '黑衣組織幹部', hp: 42, atk: 7, exp: 20, coins: 20, boss: true },
+      turn: 'player',
+      message: '最終戰開始！\n黑衣組織幹部擋在鐘塔深處。\n空白鍵：攻擊　B：麻醉手錶'
+    };
+    setDialog(state.battle.message);
+    addLog('最終戰開始。');
+  }
+
+  function checkEnding() {
+    if (!state.battle && state.bossUnlocked && state.player.clues >= 3 && state.quest === '前往鐘塔門前，揭穿真相' && state.ending) return;
+  }
+
+  const _oldWinBattle = winBattle;
+  winBattle = function() {
+    const wasBoss = state.battle?.enemy?.boss;
+    _oldWinBattle();
+    if (wasBoss) {
+      state.ending = true;
+      state.quest = '事件解決';
+      setDialog('柯南：\n「真相只有一個！」\n\n黑衣組織的計畫被阻止了，鐘塔之謎也終於解開。\n恭喜通關！按 R 可以重新開始。');
+      addLog('通關成功，鐘塔事件解決。');
+      updateUI();
+    }
+  };
+
+  function drawMap() {
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        const ch = map[y][x];
+        drawTile(x, y, ch);
+      }
+    }
+  }
+
+  function drawTile(x, y, ch) {
+    const px = x * TILE, py = y * TILE;
+    ctx.fillStyle = COLORS.grass;
+    ctx.fillRect(px, py, TILE, TILE);
+
+    if ((x + y) % 2 === 0) {
+      ctx.fillStyle = COLORS.grass2;
+      ctx.fillRect(px, py, TILE, TILE);
+    }
+
+    if (ch === '#') {
+      ctx.fillStyle = COLORS.stone;
+      ctx.fillRect(px, py, TILE, TILE);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(px+3, py+3, TILE-6, TILE-6);
+    } else if (ch === 'T') {
+      ctx.fillStyle = '#6b4f2d';
+      ctx.fillRect(px+12, py+16, 8, 12);
+      ctx.fillStyle = COLORS.tree;
+      ctx.beginPath();
+      ctx.arc(px+16, py+13, 12, 0, Math.PI*2);
+      ctx.fill();
+    } else if (ch === '~') {
+      ctx.fillStyle = COLORS.water;
+      ctx.fillRect(px, py, TILE, TILE);
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillRect(px+4, py+6, 20, 4);
+      ctx.fillRect(px+10, py+16, 14, 3);
+    } else if (ch === '=') {
+      ctx.fillStyle = COLORS.path;
+      ctx.fillRect(px, py, TILE, TILE);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(px+3, py+7, 26, 3);
+    } else if (ch === 'A' || ch === 'B' || ch === 'C') {
+      ctx.fillStyle = COLORS.house;
+      ctx.fillRect(px+5, py+12, 22, 14);
+      ctx.fillStyle = COLORS.roof;
+      ctx.beginPath();
+      ctx.moveTo(px+2, py+14);
+      ctx.lineTo(px+16, py+2);
+      ctx.lineTo(px+30, py+14);
+      ctx.fill();
+    } else if (ch === 'K' || ch === 'D') {
+      ctx.fillStyle = COLORS.tower;
+      ctx.fillRect(px+7, py+4, 18, 24);
+      ctx.fillStyle = '#4b5563';
+      ctx.fillRect(px+11, py+8, 10, 6);
+      if (ch === 'D' && !state.bossUnlocked) {
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(px+12, py+18, 8, 8);
+      }
+    }
+  }
+
+  function drawNPC(npc) {
+    const px = npc.x * TILE, py = npc.y * TILE;
+    ctx.fillStyle = npc.name === '小蘭' ? '#fda4af' : npc.name === '灰原' ? '#c4b5fd' : '#f59e0b';
+    ctx.fillRect(px+8, py+8, 16, 16);
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(px+10, py+10, 4, 4);
+    ctx.fillRect(px+18, py+10, 4, 4);
+  }
+
+  function drawClue(clue) {
+    if (clue.got) return;
+    const px = clue.x * TILE, py = clue.y * TILE;
+    ctx.fillStyle = COLORS.clue;
+    ctx.fillRect(px+10, py+10, 12, 12);
+    ctx.fillStyle = '#92400e';
+    ctx.fillRect(px+12, py+12, 8, 2);
+  }
+
+  function drawPlayer() {
+    const p = state.player;
+    const px = p.x * TILE, py = p.y * TILE;
+    ctx.fillStyle = COLORS.conanBlue;
+    ctx.fillRect(px+8, py+10, 16, 14);
+    ctx.fillStyle = '#f8d5b8';
+    ctx.fillRect(px+9, py+4, 14, 10);
+    ctx.fillStyle = '#1f2937';
+    ctx.fillRect(px+8, py+2, 16, 5);
+    ctx.fillStyle = COLORS.conanRed;
+    ctx.fillRect(px+12, py+14, 8, 3);
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(px+11, py+8, 3, 2);
+    ctx.fillRect(px+18, py+8, 3, 2);
+  }
+
+  function drawBattle() {
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const e = state.battle.enemy;
+    ctx.fillStyle = '#1f2937';
+    ctx.fillRect(60, 70, 520, 230);
+    ctx.fillRect(60, 350, 520, 220);
+
+    ctx.fillStyle = '#0b1220';
+    ctx.fillRect(90, 105, 160, 160);
+    ctx.fillStyle = COLORS.enemy;
+    ctx.fillRect(130, 130, 80, 90);
+    ctx.fillStyle = '#9ca3af';
+    ctx.fillRect(145, 105, 50, 25);
+    ctx.fillStyle = '#7f1d1d';
+    ctx.fillRect(140, 170, 60, 10);
+
+    ctx.fillStyle = '#0b1220';
+    ctx.fillRect(390, 380, 160, 160);
+    ctx.fillStyle = COLORS.conanBlue;
+    ctx.fillRect(430, 430, 80, 70);
+    ctx.fillStyle = '#f8d5b8';
+    ctx.fillRect(438, 400, 64, 34);
+    ctx.fillStyle = '#1f2937';
+    ctx.fillRect(438, 392, 64, 12);
+    ctx.fillStyle = COLORS.conanRed;
+    ctx.fillRect(455, 455, 30, 8);
+
+    drawBattleBars(e);
+  }
+
+  function drawBattleBars(enemy) {
+    ctx.fillStyle = COLORS.white;
+    ctx.font = 'bold 22px sans-serif';
+    ctx.fillText(enemy.name, 80, 95);
+    ctx.fillText('柯南', 410, 375);
+
+    // enemy hp
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(80, 110, 220, 16);
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(80, 110, 220 * Math.max(0, enemy.hp) / (enemy.boss ? 42 : Math.max(enemy.hp,1)), 16);
+
+    // player hp
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(410, 390, 180, 16);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(410, 390, 180 * state.player.hp / state.player.maxHp, 16);
+
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '16px sans-serif';
+    ctx.fillText(`HP ${Math.max(0, enemy.hp)}`, 80, 145);
+    ctx.fillText(`HP ${state.player.hp}/${state.player.maxHp}`, 410, 430);
+    ctx.fillText('空白鍵：攻擊', 95, 385);
+    ctx.fillText(`B：麻醉手錶 (${state.player.stunShots})`, 95, 415);
+    ctx.fillText('R：重新開始', 95, 445);
+  }
+
+  function drawOverlay() {
+    ctx.fillStyle = 'rgba(15,23,42,0.25)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(17,24,39,0.8)';
+    ctx.fillRect(12, 12, 240, 72);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillText('米花謎城', 24, 40);
+    ctx.font = '14px sans-serif';
+    ctx.fillText(`Lv.${state.player.level}  HP ${state.player.hp}/${state.player.maxHp}`, 24, 63);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (state.mode === 'battle') {
+      drawBattle();
+      return;
+    }
+    drawMap();
+    state.clues.forEach(drawClue);
+    state.npcs.forEach(drawNPC);
+    drawPlayer();
+    drawOverlay();
+  }
+
+  function loop(ts) {
+    if (state.mode === 'world' && ts - state.lastMove > 120) {
+      if (state.keys['ArrowUp'] || state.keys['w'] || state.keys['W']) { move(0, -1); state.lastMove = ts; }
+      else if (state.keys['ArrowDown'] || state.keys['s'] || state.keys['S']) { move(0, 1); state.lastMove = ts; }
+      else if (state.keys['ArrowLeft'] || state.keys['a'] || state.keys['A']) { move(-1, 0); state.lastMove = ts; }
+      else if (state.keys['ArrowRight'] || state.keys['d'] || state.keys['D']) { move(1, 0); state.lastMove = ts; }
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    state.keys[e.key] = true;
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+    if (e.key === ' ') interact();
+    if (e.key === 'b' || e.key === 'B') {
+      if (state.mode === 'battle') battleAction('stun');
+    }
+    if (e.key === 'r' || e.key === 'R') resetGame();
+  });
+  window.addEventListener('keyup', e => state.keys[e.key] = false);
+
+  document.getElementById('restartBtn').addEventListener('click', resetGame);
+  document.getElementById('helpBtn').addEventListener('click', () => {
+    setDialog('操作說明\n\n方向鍵 / WASD：移動\n空白鍵：互動、對話、戰鬥攻擊\nB：戰鬥中使用麻醉手錶\nR：重新開始\n\n流程：找博士 → 找 3 個線索 → 找灰原 → 去鐘塔決戰');
+  });
+
+  resetGame();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
